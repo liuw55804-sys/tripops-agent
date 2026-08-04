@@ -1,0 +1,44 @@
+servers:
+  - name: weather
+    transport: stdio
+    command: uv
+    args: ["run", "python", "mcp_servers/weather_server.py"]
+    discovery_timeout_seconds: 8
+  - name: transport
+    transport: stdio
+    command: uv
+    args: ["run", "python", "mcp_servers/transport_server.py"]
+    discovery_timeout_seconds: 8
+  - name: policy
+    transport: stdio
+    command: uv
+    args: ["run", "python", "mcp_servers/policy_server.py"]
+    discovery_timeout_seconds: 8
+
+tool_policies:
+  weather.get_forecast:
+    capabilities: [weather_search]
+    allowed_agents: [weather_researcher, general_researcher]
+    timeout_seconds: 5
+    freshness_seconds: 1800
+    estimated_latency_ms: 120
+  transport.search_options:
+    capabilities: [transport_search]
+    allowed_agents: [transport_researcher, general_researcher]
+    timeout_seconds: 8
+    freshness_seconds: 900
+    estimated_latency_ms: 250
+  transport.propose_rebooking:
+    capabilities: [booking_change]
+    allowed_agents: [transport_researcher]
+    required_permissions: [booking:write]
+    risk_level: 3
+    requires_approval: true
+    timeout_seconds: 10
+    estimated_cost_units: 2
+  policy.search_policy:
+    capabilities: [policy_search]
+    allowed_agents: [policy_researcher, general_researcher]
+    timeout_seconds: 5
+    freshness_seconds: 86400
+

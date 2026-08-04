@@ -1,0 +1,1688 @@
+{
+  "suite_name": "tripops-travelplanner-v1",
+  "generated_at": "2026-08-04T14:34:42.596893+00:00",
+  "summary": {
+    "case_count": 80,
+    "hard_constraint_pass_rate": 0.4375,
+    "violation_precision": 1.0,
+    "violation_recall": 1.0,
+    "violation_f1": 1.0,
+    "preference_coverage": 1.0,
+    "group_fairness": 1.0,
+    "citation_correctness": 1.0,
+    "citation_freshness": 1.0,
+    "affected_item_recall": 1.0,
+    "plan_preservation": 1.0,
+    "degradation_success_rate": 1.0,
+    "average_latency_ms": 0.3512140752718551
+  },
+  "by_category": {
+    "standard": {
+      "case_count": 50,
+      "hard_constraint_pass_rate": 0.1,
+      "violation_precision": 1.0,
+      "violation_recall": 1.0,
+      "violation_f1": 1.0,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success_rate": 1.0,
+      "average_latency_ms": 0.02434580004774034
+    },
+    "dynamic": {
+      "case_count": 20,
+      "hard_constraint_pass_rate": 1.0,
+      "violation_precision": 1.0,
+      "violation_recall": 1.0,
+      "violation_f1": 1.0,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success_rate": 1.0,
+      "average_latency_ms": 0.0159542505571153
+    },
+    "fault": {
+      "case_count": 10,
+      "hard_constraint_pass_rate": 1.0,
+      "violation_precision": 1.0,
+      "violation_recall": 1.0,
+      "violation_f1": 1.0,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success_rate": 1.0,
+      "average_latency_ms": 2.6560751008219086
+    }
+  },
+  "results": [
+    {
+      "case_id": "standard-00",
+      "category": "standard",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.186416000360623
+    },
+    {
+      "case_id": "standard-01",
+      "category": "standard",
+      "expected_codes": [
+        "budget_exceeded"
+      ],
+      "actual_codes": [
+        "budget_exceeded"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.057249999372288585
+    },
+    {
+      "case_id": "standard-02",
+      "category": "standard",
+      "expected_codes": [
+        "time_overlap"
+      ],
+      "actual_codes": [
+        "time_overlap"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.03420800203457475
+    },
+    {
+      "case_id": "standard-03",
+      "category": "standard",
+      "expected_codes": [
+        "transit_time_insufficient"
+      ],
+      "actual_codes": [
+        "transit_time_insufficient"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.02779200440272689
+    },
+    {
+      "case_id": "standard-04",
+      "category": "standard",
+      "expected_codes": [
+        "closed_at_arrival"
+      ],
+      "actual_codes": [
+        "closed_at_arrival"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.023499989765696228
+    },
+    {
+      "case_id": "standard-05",
+      "category": "standard",
+      "expected_codes": [
+        "required_preference_missing"
+      ],
+      "actual_codes": [
+        "required_preference_missing"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.028583002858795226
+    },
+    {
+      "case_id": "standard-06",
+      "category": "standard",
+      "expected_codes": [
+        "excluded_activity_present"
+      ],
+      "actual_codes": [
+        "excluded_activity_present"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.02358300844207406
+    },
+    {
+      "case_id": "standard-07",
+      "category": "standard",
+      "expected_codes": [
+        "dietary_unsafe"
+      ],
+      "actual_codes": [
+        "dietary_unsafe"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.027375004719942808
+    },
+    {
+      "case_id": "standard-08",
+      "category": "standard",
+      "expected_codes": [
+        "accessibility_unmet"
+      ],
+      "actual_codes": [
+        "accessibility_unmet"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.02333299198653549
+    },
+    {
+      "case_id": "standard-09",
+      "category": "standard",
+      "expected_codes": [
+        "date_out_of_range"
+      ],
+      "actual_codes": [
+        "date_out_of_range"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.018749997252598405
+    },
+    {
+      "case_id": "standard-10",
+      "category": "standard",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.015958008589223027
+    },
+    {
+      "case_id": "standard-11",
+      "category": "standard",
+      "expected_codes": [
+        "budget_exceeded"
+      ],
+      "actual_codes": [
+        "budget_exceeded"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.020625011529773474
+    },
+    {
+      "case_id": "standard-12",
+      "category": "standard",
+      "expected_codes": [
+        "time_overlap"
+      ],
+      "actual_codes": [
+        "time_overlap"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.017625003238208592
+    },
+    {
+      "case_id": "standard-13",
+      "category": "standard",
+      "expected_codes": [
+        "transit_time_insufficient"
+      ],
+      "actual_codes": [
+        "transit_time_insufficient"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.017207989003509283
+    },
+    {
+      "case_id": "standard-14",
+      "category": "standard",
+      "expected_codes": [
+        "closed_at_arrival"
+      ],
+      "actual_codes": [
+        "closed_at_arrival"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01633400097489357
+    },
+    {
+      "case_id": "standard-15",
+      "category": "standard",
+      "expected_codes": [
+        "required_preference_missing"
+      ],
+      "actual_codes": [
+        "required_preference_missing"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.05020799289923161
+    },
+    {
+      "case_id": "standard-16",
+      "category": "standard",
+      "expected_codes": [
+        "excluded_activity_present"
+      ],
+      "actual_codes": [
+        "excluded_activity_present"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.021333005861379206
+    },
+    {
+      "case_id": "standard-17",
+      "category": "standard",
+      "expected_codes": [
+        "dietary_unsafe"
+      ],
+      "actual_codes": [
+        "dietary_unsafe"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.0219999928958714
+    },
+    {
+      "case_id": "standard-18",
+      "category": "standard",
+      "expected_codes": [
+        "accessibility_unmet"
+      ],
+      "actual_codes": [
+        "accessibility_unmet"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.019708997569978237
+    },
+    {
+      "case_id": "standard-19",
+      "category": "standard",
+      "expected_codes": [
+        "date_out_of_range"
+      ],
+      "actual_codes": [
+        "date_out_of_range"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01750000228639692
+    },
+    {
+      "case_id": "standard-20",
+      "category": "standard",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014666991773992777
+    },
+    {
+      "case_id": "standard-21",
+      "category": "standard",
+      "expected_codes": [
+        "budget_exceeded"
+      ],
+      "actual_codes": [
+        "budget_exceeded"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01979200169444084
+    },
+    {
+      "case_id": "standard-22",
+      "category": "standard",
+      "expected_codes": [
+        "time_overlap"
+      ],
+      "actual_codes": [
+        "time_overlap"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.017750004190020263
+    },
+    {
+      "case_id": "standard-23",
+      "category": "standard",
+      "expected_codes": [
+        "transit_time_insufficient"
+      ],
+      "actual_codes": [
+        "transit_time_insufficient"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01824999344535172
+    },
+    {
+      "case_id": "standard-24",
+      "category": "standard",
+      "expected_codes": [
+        "closed_at_arrival"
+      ],
+      "actual_codes": [
+        "closed_at_arrival"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01650000922381878
+    },
+    {
+      "case_id": "standard-25",
+      "category": "standard",
+      "expected_codes": [
+        "required_preference_missing"
+      ],
+      "actual_codes": [
+        "required_preference_missing"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.019166007405146956
+    },
+    {
+      "case_id": "standard-26",
+      "category": "standard",
+      "expected_codes": [
+        "excluded_activity_present"
+      ],
+      "actual_codes": [
+        "excluded_activity_present"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.0212500017369166
+    },
+    {
+      "case_id": "standard-27",
+      "category": "standard",
+      "expected_codes": [
+        "dietary_unsafe"
+      ],
+      "actual_codes": [
+        "dietary_unsafe"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.02187499194405973
+    },
+    {
+      "case_id": "standard-28",
+      "category": "standard",
+      "expected_codes": [
+        "accessibility_unmet"
+      ],
+      "actual_codes": [
+        "accessibility_unmet"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.019416998839005828
+    },
+    {
+      "case_id": "standard-29",
+      "category": "standard",
+      "expected_codes": [
+        "date_out_of_range"
+      ],
+      "actual_codes": [
+        "date_out_of_range"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014749995898455381
+    },
+    {
+      "case_id": "standard-30",
+      "category": "standard",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.012999997125007212
+    },
+    {
+      "case_id": "standard-31",
+      "category": "standard",
+      "expected_codes": [
+        "budget_exceeded"
+      ],
+      "actual_codes": [
+        "budget_exceeded"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.029166010790504515
+    },
+    {
+      "case_id": "standard-32",
+      "category": "standard",
+      "expected_codes": [
+        "time_overlap"
+      ],
+      "actual_codes": [
+        "time_overlap"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01575000351294875
+    },
+    {
+      "case_id": "standard-33",
+      "category": "standard",
+      "expected_codes": [
+        "transit_time_insufficient"
+      ],
+      "actual_codes": [
+        "transit_time_insufficient"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01591698674019426
+    },
+    {
+      "case_id": "standard-34",
+      "category": "standard",
+      "expected_codes": [
+        "closed_at_arrival"
+      ],
+      "actual_codes": [
+        "closed_at_arrival"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014999997802078724
+    },
+    {
+      "case_id": "standard-35",
+      "category": "standard",
+      "expected_codes": [
+        "required_preference_missing"
+      ],
+      "actual_codes": [
+        "required_preference_missing"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01750000228639692
+    },
+    {
+      "case_id": "standard-36",
+      "category": "standard",
+      "expected_codes": [
+        "excluded_activity_present"
+      ],
+      "actual_codes": [
+        "excluded_activity_present"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.018457998521625996
+    },
+    {
+      "case_id": "standard-37",
+      "category": "standard",
+      "expected_codes": [
+        "dietary_unsafe"
+      ],
+      "actual_codes": [
+        "dietary_unsafe"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01937500201165676
+    },
+    {
+      "case_id": "standard-38",
+      "category": "standard",
+      "expected_codes": [
+        "accessibility_unmet"
+      ],
+      "actual_codes": [
+        "accessibility_unmet"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.018000006093643606
+    },
+    {
+      "case_id": "standard-39",
+      "category": "standard",
+      "expected_codes": [
+        "date_out_of_range"
+      ],
+      "actual_codes": [
+        "date_out_of_range"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01633398642297834
+    },
+    {
+      "case_id": "standard-40",
+      "category": "standard",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014124991139397025
+    },
+    {
+      "case_id": "standard-41",
+      "category": "standard",
+      "expected_codes": [
+        "budget_exceeded"
+      ],
+      "actual_codes": [
+        "budget_exceeded"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.029125003493390977
+    },
+    {
+      "case_id": "standard-42",
+      "category": "standard",
+      "expected_codes": [
+        "time_overlap"
+      ],
+      "actual_codes": [
+        "time_overlap"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.017291997210122645
+    },
+    {
+      "case_id": "standard-43",
+      "category": "standard",
+      "expected_codes": [
+        "transit_time_insufficient"
+      ],
+      "actual_codes": [
+        "transit_time_insufficient"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.017875005141831934
+    },
+    {
+      "case_id": "standard-44",
+      "category": "standard",
+      "expected_codes": [
+        "closed_at_arrival"
+      ],
+      "actual_codes": [
+        "closed_at_arrival"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.016332996892742813
+    },
+    {
+      "case_id": "standard-45",
+      "category": "standard",
+      "expected_codes": [
+        "required_preference_missing"
+      ],
+      "actual_codes": [
+        "required_preference_missing"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01891700958367437
+    },
+    {
+      "case_id": "standard-46",
+      "category": "standard",
+      "expected_codes": [
+        "excluded_activity_present"
+      ],
+      "actual_codes": [
+        "excluded_activity_present"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01812499249354005
+    },
+    {
+      "case_id": "standard-47",
+      "category": "standard",
+      "expected_codes": [
+        "dietary_unsafe"
+      ],
+      "actual_codes": [
+        "dietary_unsafe"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01954101026058197
+    },
+    {
+      "case_id": "standard-48",
+      "category": "standard",
+      "expected_codes": [
+        "accessibility_unmet"
+      ],
+      "actual_codes": [
+        "accessibility_unmet"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01854199217632413
+    },
+    {
+      "case_id": "standard-49",
+      "category": "standard",
+      "expected_codes": [
+        "date_out_of_range"
+      ],
+      "actual_codes": [
+        "date_out_of_range"
+      ],
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": false,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01620801049284637
+    },
+    {
+      "case_id": "dynamic-00",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.020500010577961802
+    },
+    {
+      "case_id": "dynamic-01",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.018457998521625996
+    },
+    {
+      "case_id": "dynamic-02",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.016582998796366155
+    },
+    {
+      "case_id": "dynamic-03",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.015416007954627275
+    },
+    {
+      "case_id": "dynamic-04",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014833000022917986
+    },
+    {
+      "case_id": "dynamic-05",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.017917001969181
+    },
+    {
+      "case_id": "dynamic-06",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.018292004824616015
+    },
+    {
+      "case_id": "dynamic-07",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.0195419997908175
+    },
+    {
+      "case_id": "dynamic-08",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.018250007997266948
+    },
+    {
+      "case_id": "dynamic-09",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.017124999430961907
+    },
+    {
+      "case_id": "dynamic-10",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.013083990779705346
+    },
+    {
+      "case_id": "dynamic-11",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.01345899363514036
+    },
+    {
+      "case_id": "dynamic-12",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.013791999663226306
+    },
+    {
+      "case_id": "dynamic-13",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014582998119294643
+    },
+    {
+      "case_id": "dynamic-14",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014582998119294643
+    },
+    {
+      "case_id": "dynamic-15",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014500008546747267
+    },
+    {
+      "case_id": "dynamic-16",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014833989553153515
+    },
+    {
+      "case_id": "dynamic-17",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014625009498558939
+    },
+    {
+      "case_id": "dynamic-18",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014499993994832039
+    },
+    {
+      "case_id": "dynamic-19",
+      "category": "dynamic",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.014208999346010387
+    },
+    {
+      "case_id": "fault-00",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 12.486459003412165
+    },
+    {
+      "case_id": "fault-01",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.26212500233668834
+    },
+    {
+      "case_id": "fault-02",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.18191701383329928
+    },
+    {
+      "case_id": "fault-03",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.2307499962626025
+    },
+    {
+      "case_id": "fault-04",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.16170799790415913
+    },
+    {
+      "case_id": "fault-05",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 12.407458008965477
+    },
+    {
+      "case_id": "fault-06",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.28774999373126775
+    },
+    {
+      "case_id": "fault-07",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.2094999945256859
+    },
+    {
+      "case_id": "fault-08",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.17591699725016952
+    },
+    {
+      "case_id": "fault-09",
+      "category": "fault",
+      "expected_codes": [],
+      "actual_codes": [],
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "hard_constraint_pass": true,
+      "preference_coverage": 1.0,
+      "group_fairness": 1.0,
+      "citation_correctness": 1.0,
+      "citation_freshness": 1.0,
+      "affected_item_recall": 1.0,
+      "plan_preservation": 1.0,
+      "degradation_success": true,
+      "latency_ms": 0.1571669999975711
+    }
+  ]
+}
