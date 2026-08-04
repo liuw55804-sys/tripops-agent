@@ -113,10 +113,21 @@ async def test_structured_planner_augments_required_research_and_schedules() -> 
 
 def test_prompt_synopsis_excludes_raw_conversation_and_artifacts() -> None:
     current = state()
+    current["request"] = request().model_copy(
+        update={"raw_requirement": "Prefer a four-star hotel near public transport."}
+    )
     synopsis = state_synopsis(current)  # type: ignore[arg-type]
     messages = planner_messages(current)  # type: ignore[arg-type]
 
     assert synopsis["request_id"] == "llm-trip"
+    assert synopsis["origin"] == "Shanghai"
+    assert synopsis["start_date"] == "2030-10-01"
+    assert synopsis["end_date"] == "2030-10-02"
+    assert synopsis["budget"] == "1200"
+    assert synopsis["travelers"][0]["preferences"] == ["culture"]
+    assert synopsis["raw_requirement"] == (
+        "Prefer a four-star hotel near public transport."
+    )
     assert "messages" not in synopsis
     assert "artifact" not in str(synopsis).lower()
     assert len(messages) == 2

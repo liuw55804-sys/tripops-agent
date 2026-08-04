@@ -137,8 +137,15 @@ class TripOpsRunService:
             record.status = RunStatus.WAITING_APPROVAL
         elif result.get("phase") is WorkflowPhase.FAILED or result.get("error"):
             record.status = RunStatus.FAILED
-        else:
+        elif result.get("phase") is WorkflowPhase.FINISH and result.get("plan") is not None:
             record.status = RunStatus.COMPLETED
+        else:
+            phase = result.get("phase")
+            record.status = RunStatus.FAILED
+            record.error = (
+                "workflow terminated without a finished plan "
+                f"(phase={phase.value if phase else 'missing'})"
+            )
 
     @staticmethod
     def _fail(record: RunRecord, error: Exception) -> None:

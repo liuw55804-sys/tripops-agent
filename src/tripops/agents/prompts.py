@@ -8,10 +8,14 @@ from tripops.context.state import TripOpsState
 
 SUPERVISOR_SYSTEM_PROMPT = """You are TripOps Supervisor, the control-plane agent.
 Choose exactly one next workflow phase from the structured schema. Never invent facts,
-search destinations, or write an itinerary. Prefer deterministic verification after
-research. Replan only when a disruption or ERROR violation invalidates the current plan.
-Ask one concise clarification only when required request fields are absent. Consequential
-actions must route to approval. Explain the routing decision in one sentence."""
+search destinations, or write an itinerary. The TripRequest has already passed schema
+validation: origin, destination, travel dates, budget, and at least one traveler are present.
+Optional preferences such as accommodation type must never block planning. On initial intake,
+when has_request is true and plan_revision is null, choose plan. Never choose intake, clarify,
+or research as a next phase; research fan-out is controlled by the graph. Prefer deterministic
+verification after research. Replan only when a disruption or ERROR violation invalidates the
+current plan. Consequential actions must route to approval. Explain the routing decision in one
+sentence."""
 
 PLANNER_SYSTEM_PROMPT = """You are TripOps Planner. Produce a small research task DAG,
 not a prose itinerary. Each task must have a stable capability and explicit dependencies.
@@ -68,9 +72,40 @@ def state_synopsis(state: TripOpsState) -> dict[str, Any]:
         "phase": state["phase"].value,
         "has_request": request is not None,
         "request_id": request.id if request else None,
+        "origin": request.origin if request else None,
         "destinations": list(request.destinations) if request else [],
+        "start_date": request.start_date.isoformat() if request else None,
+        "end_date": request.end_date.isoformat() if request else None,
+        "budget": str(request.budget) if request else None,
+        "currency": request.currency if request else None,
         "traveler_count": len(request.travelers) if request else 0,
+        "travelers": (
+            [
+                {
+                    "preferences": list(traveler.preferences),
+                    "accessibility_needs": list(traveler.accessibility_needs),
+                    "dietary_restrictions": list(traveler.dietary_restrictions),
+                }
+                for traveler in request.travelers
+            ]
+            if request
+            else []
+        ),
         "constraint_count": len(request.constraints) if request else 0,
+        "constraints": (
+            [
+                {
+                    "kind": constraint.kind.value,
+                    "priority": constraint.priority.value,
+                    "description": constraint.description,
+                    "value": constraint.value,
+                }
+                for constraint in request.constraints
+            ]
+            if request
+            else []
+        ),
+        "raw_requirement": request.raw_requirement if request else "",
         "plan_revision": plan.revision if plan else None,
         "plan_step_count": len(plan.steps) if plan else 0,
         "itinerary_item_count": len(plan.itinerary) if plan else 0,

@@ -240,6 +240,7 @@ async function processRun(run) {
     await loadTrace();
     return true;
   }
+  if (run.status === "completed") throw new Error("工作流异常结束：后端未返回可用计划");
   if (run.status === "failed") throw new Error(run.error || "Agent 工作流执行失败");
   return run.status === "waiting_approval";
 }
@@ -270,8 +271,14 @@ function subscribeToEvents(runId) {
       } catch (error) { console.warn("Invalid SSE event", error); }
     });
   });
-  source.addEventListener("run_status", (event) => {
-    try { processRun(JSON.parse(event.data)); } finally { source.close(); }
+  source.addEventListener("run_status", async (event) => {
+    try {
+      await processRun(JSON.parse(event.data));
+    } catch (error) {
+      console.warn("Terminal run status", error);
+    } finally {
+      source.close();
+    }
   });
   source.onerror = () => source.close();
 }

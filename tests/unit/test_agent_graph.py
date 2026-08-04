@@ -4,7 +4,13 @@ from decimal import Decimal
 
 import pytest
 
-from tripops.agents import ResearchResult, ResearchTask, build_tripops_graph, initial_state
+from tripops.agents import (
+    ResearchResult,
+    ResearchTask,
+    SupervisorDecision,
+    build_tripops_graph,
+    initial_state,
+)
 from tripops.agents.graph import GraphState
 from tripops.agents.router import ResearcherRouter
 from tripops.agents.rule_based import RuleBasedSupervisor
@@ -84,6 +90,14 @@ class PassVerifier:
         return ()
 
 
+class InvalidIntakeSupervisor:
+    async def decide(self, _: GraphState) -> SupervisorDecision:
+        return SupervisorDecision(
+            next_phase=WorkflowPhase.INTAKE,
+            reason="incorrectly asks for fields already present",
+        )
+
+
 @pytest.mark.asyncio
 async def test_graph_runs_researchers_in_parallel_and_finishes() -> None:
     planner = TwoStepPlanner()
@@ -101,6 +115,29 @@ async def test_graph_runs_researchers_in_parallel_and_finishes() -> None:
     assert len(result["evidence"]) == 2
     assert researcher.max_active == 2
     assert "Verification: `passed`" in result["final_response"]
+
+
+@pytest.mark.asyncio
+async def test_graph_corrects_invalid_llm_supervisor_transition() -> None:
+    traces = InMemoryTraceSink()
+    trip_graph = build_tripops_graph(
+        supervisor=InvalidIntakeSupervisor(),
+        planner=TwoStepPlanner(),
+        researcher_router=ResearcherRouter((ConcurrentResearcher(),)),
+        verifier=PassVerifier(),
+        trace_sink=traces,
+    )
+
+    result = await trip_graph.run(initial_state(request()))
+    guard_events = [
+        event for event in traces.snapshot() if event.name == "supervisor_transition_guard"
+    ]
+
+    assert result["phase"] is WorkflowPhase.FINISH
+    assert result["plan"].revision == 1
+    assert guard_events
+    assert guard_events[0].attributes["proposed_phase"] == "intake"
+    assert guard_events[0].attributes["selected_phase"] == "plan"
 
 
 @pytest.mark.asyncio

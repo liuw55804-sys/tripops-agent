@@ -115,15 +115,39 @@ def build_tripops_graph(
     traces = trace_sink or NullTraceSink()
 
     async def supervisor_node(state: GraphState) -> dict[str, Any]:
+        trace_attributes: dict[str, Any] = {}
         with trace_span(
             traces,
             run_id=state["run_id"],
             kind=TraceKind.AGENT,
             name="supervisor",
+            attributes=trace_attributes,
         ):
             decision = await supervisor.decide(cast(TripOpsState, state))
+            guarded_phase = _guard_supervisor_transition(state, decision.next_phase)
+            trace_attributes.update(
+                {
+                    "proposed_phase": decision.next_phase.value,
+                    "next_phase": guarded_phase.value,
+                    "reason": decision.reason,
+                    "transition_corrected": guarded_phase is not decision.next_phase,
+                }
+            )
+            if guarded_phase is not decision.next_phase:
+                emit_trace(
+                    traces,
+                    run_id=state["run_id"],
+                    kind=TraceKind.DEGRADATION,
+                    name="supervisor_transition_guard",
+                    status=TraceStatus.DEGRADED,
+                    attributes={
+                        "proposed_phase": decision.next_phase.value,
+                        "selected_phase": guarded_phase.value,
+                        "reason": decision.reason,
+                    },
+                )
         update: dict[str, Any] = {
-            "phase": decision.next_phase,
+            "phase": guarded_phase,
             "supervisor_reason": decision.reason,
         }
         if decision.clarification_question:
@@ -381,6 +405,32 @@ def build_tripops_graph(
     builder.add_edge("terminal", END)
 
     return TripOpsGraph(builder.compile(checkpointer=checkpointer))
+
+
+def _guard_supervisor_transition(
+    state: GraphState,
+    proposed: WorkflowPhase,
+) -> WorkflowPhase:
+    """Keep LLM routing inside the deterministic workflow state machine."""
+    if state.get("error"):
+        expected = WorkflowPhase.FAILED
+    elif "request" not in state:
+        expected = WorkflowPhase.CLARIFY
+    elif state.get("plan") is None:
+        expected = WorkflowPhase.PLAN
+    elif state.get("disruption") is not None and not state.get("repair_scope"):
+        expected = WorkflowPhase.REPLAN
+    elif state.get("violations") and not state.get("verification_complete", False):
+        expected = WorkflowPhase.REPLAN
+    elif not state.get("verification_complete", False):
+        expected = WorkflowPhase.VERIFY
+    elif state.get("pending_approval"):
+        expected = WorkflowPhase.APPROVAL
+    else:
+        expected = WorkflowPhase.FINISH
+    if proposed is WorkflowPhase.FAILED:
+        return proposed
+    return proposed if proposed is expected else expected
 
 
 def _default_finalizer(state: GraphState) -> str:
