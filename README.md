@@ -34,6 +34,7 @@ TripOps 是一个面向多人、多约束旅行规划和行程中断恢复的 Ag
 - `M5` 已完成：SQLite checkpoint、跨进程审批恢复、异常降级和统一 JSONL Trace。
 - `M6` 已完成：80 个 TravelPlanner 风格案例、故障注入和可复现效果报告。
 - `M7` 已完成：异步 Run API、SSE trace、disruption 注入、审批恢复和交付文档。
+- `M8` 已完成：南半球假日风格交互台、实时 Agent 状态、行程/证据可视化和一键中断演练。
 
 当前所有工具调用均可统一经过权限、风险、审批、预算、缓存、超时、重试、熔断、fallback、Artifact 外置与事件追踪。范围和验收指标见 [docs/scope.md](docs/scope.md)，总体架构见 [docs/architecture.md](docs/architecture.md)，API 使用见 [docs/api.md](docs/api.md)。
 
@@ -48,11 +49,17 @@ uv run tripops-eval
 uv run tripops-api
 ```
 
-API 启动后访问 `http://127.0.0.1:9900/docs`。离线模式不需要模型 API Key；生产接入参数见 `.env.example`。
+API 启动后：
+
+- 打开 `http://127.0.0.1:9900/` 使用交互页面；填写旅行简报并点击“让 Agent 开始规划”。
+- 行程生成后点击“模拟热带风暴”，观察 revision、原计划保留率和局部重规划结果。
+- 打开 `http://127.0.0.1:9900/docs` 调试原始 API。
+
+离线模式不需要模型 API Key，也不需要前端构建步骤；HTML、CSS 和原生 JavaScript 由 FastAPI 直接提供。生产接入参数见 `.env.example`。
 
 ## 可验证结果
 
-- 86 个自动化测试，语句/分支综合覆盖率 89.94%。
+- 87 个自动化测试，语句/分支综合覆盖率 89.96%。
 - 约 9.36k 行有效 Python（源码、测试与 MCP Mock），仓库首个提交共 12k+ 行。
 - 50 个标准约束、20 个动态变更、10 个故障注入案例。
 - 基线中 labelled violation F1、citation correctness/freshness、局部影响召回、原计划保留和 fallback 成功率均为 100%。
@@ -63,7 +70,7 @@ API 启动后访问 `http://127.0.0.1:9900/docs`。离线模式不需要模型 A
 ```text
 src/tripops/
 ├── agents/          # Supervisor/Planner/Researcher/Verifier 与 LangGraph
-├── api/             # Run API、SSE、disruption、approval
+├── api/             # Run API、SSE、disruption、approval 与交互页面
 ├── constraints/     # 硬约束校验和局部影响分析
 ├── context/         # runtime/state/memory/artifact/checkpoint
 ├── evaluation/      # 80-case benchmark、指标和故障探针

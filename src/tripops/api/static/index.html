@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#073c47" />
+    <meta name="description" content="TripOps 多智能体旅行规划与中断恢复演示台" />
+    <title>TripOps · 南纬假日实验室</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#planner">跳到行程规划</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="TripOps 首页">
+        <span class="brand-mark" aria-hidden="true"><i></i></span>
+        <span><strong>TRIPOPS</strong><small>SOUTHBOUND LAB</small></span>
+      </a>
+      <nav aria-label="主导航">
+        <a href="#planner">设计旅程</a>
+        <a href="#agent-dock">Agent 协作</a>
+        <a href="/docs" target="_blank" rel="noreferrer">API 文档 ↗</a>
+      </nav>
+      <span class="system-pill"><i></i> Agent system ready</span>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>26° S</span> FOLLOW THE SUMMER</p>
+          <h1 id="hero-title">把假期交给一支<br /><em>会应变</em>的旅行团队。</h1>
+          <p class="hero-lede">从海港晨光到峡湾晚风，Supervisor、Planner 与 Researcher 在约束内协作；天气突变时，只重排真正受影响的部分。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#planner">开始设计旅程 <span>↘</span></a>
+            <button class="text-button" id="load-demo" type="button">载入皇后镇示例 <span>→</span></button>
+          </div>
+          <dl class="hero-stats" aria-label="系统能力摘要">
+            <div><dt>3</dt><dd>协作角色</dd></div>
+            <div><dt>100%</dt><dd>约束可追溯</dd></div>
+            <div><dt>&lt;1s</dt><dd>离线演示响应</dd></div>
+          </dl>
+        </div>
+
+        <div class="postcard" aria-label="南半球海岸插画">
+          <div class="postcard-stamp">SUMMER<br />EDITION</div>
+          <svg viewBox="0 0 680 610" role="img" aria-labelledby="scene-title scene-desc">
+            <title id="scene-title">南半球夏日海岸</title>
+            <desc id="scene-desc">橙色太阳、绿色山丘、蓝色海湾与一艘白色帆船</desc>
+            <defs>
+              <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a9e3e8"/><stop offset="1" stop-color="#e8f5e7"/></linearGradient>
+              <linearGradient id="sea" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#087f8e"/><stop offset="1" stop-color="#064e63"/></linearGradient>
+            </defs>
+            <rect width="680" height="610" rx="34" fill="url(#sky)"/>
+            <circle cx="505" cy="126" r="72" fill="#ff795b"/>
+            <path d="M0 275C94 218 174 234 248 297C335 221 421 209 516 278C585 247 636 252 680 280V385H0Z" fill="#78a871"/>
+            <path d="M0 337C93 312 157 318 236 355C327 300 404 298 487 344C553 319 616 322 680 349V610H0Z" fill="url(#sea)"/>
+            <path d="M0 428C100 404 169 421 250 466C326 508 398 495 473 446C547 398 611 401 680 420V610H0Z" fill="#0b6975" opacity=".72"/>
+            <path d="M80 406C158 383 209 393 281 432M382 414C454 370 524 366 603 390M45 500C150 476 226 497 299 532" fill="none" stroke="#93d7d4" stroke-width="8" stroke-linecap="round" opacity=".75"/>
+            <g transform="translate(414 314)"><path d="M0 95h142l-24 18H16Z" fill="#fff9e9"/><path d="M65 0v96" stroke="#073c47" stroke-width="7"/><path d="M72 9l61 75H72Z" fill="#fff9e9"/><path d="M57 28L9 84h48Z" fill="#ffd16d"/></g>
+            <g fill="#073c47"><path d="M78 297c28-55 41-109 34-163l12-1c12 64 1 122-28 174Z"/><path d="M117 151c-25-27-52-34-80-21c32 3 54 14 68 34c-34-9-61-1-79 24c31-12 58-13 81-2c-9-33 5-61 41-83c-33 8-54 27-64 56c-2-27-15-49-41-66c18 24 27 45 25 63c-9-25-27-42-53-53c25 19 40 38 46 58c-25-16-49-18-73-5c28-4 50 3 66 22Z"/></g>
+          </svg>
+          <div class="postcard-caption"><span>01</span><p><strong>Queenstown, NZ</strong><br />Lakeside route · 7 days</p><small>45.0312° S</small></div>
+        </div>
+      </section>
+
+      <section class="planner-shell" id="planner" aria-labelledby="planner-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">YOUR TRIP, ORCHESTRATED</p><h2 id="planner-title">设计一次南纬假日</h2></div>
+          <p>描述边界，剩下的交给 Agent。每一个建议都带证据，每一次改动都有原因。</p>
+        </div>
+
+        <div class="workspace">
+          <form class="trip-form" id="trip-form" novalidate>
+            <div class="form-intro"><span>01</span><div><h3>旅行简报</h3><p>告诉团队你从哪里出发、想去哪里。</p></div></div>
+            <div class="field-row">
+              <label>从哪里出发<input id="origin" name="origin" value="上海" required autocomplete="off" /></label>
+              <label>目的地<input id="destination" name="destination" value="新西兰皇后镇" required autocomplete="off" /></label>
+            </div>
+            <div class="field-row three">
+              <label>出发日期<input id="start-date" name="start_date" type="date" required /></label>
+              <label>返程日期<input id="end-date" name="end_date" type="date" required /></label>
+              <label>预算（CNY）<input id="budget" name="budget" type="number" min="1" step="100" value="18000" required /></label>
+            </div>
+            <fieldset>
+              <legend>这次更想要什么？</legend>
+              <div class="choice-grid">
+                <label class="choice"><input type="checkbox" name="preference" value="湖泊与自然" checked /><span>◌</span><b>湖泊与自然</b></label>
+                <label class="choice"><input type="checkbox" name="preference" value="在地餐饮" checked /><span>♨</span><b>在地餐饮</b></label>
+                <label class="choice"><input type="checkbox" name="preference" value="轻徒步" /><span>⌁</span><b>轻徒步</b></label>
+                <label class="choice"><input type="checkbox" name="preference" value="慢节奏" /><span>◒</span><b>慢节奏</b></label>
+              </div>
+            </fieldset>
+            <label>补充要求<textarea id="requirement" name="requirement" rows="3">每天不要安排太满，保留看日落的时间；优先公共交通。</textarea></label>
+            <button class="button button-primary submit-button" type="submit"><span>让 Agent 开始规划</span><b>↗</b></button>
+            <p class="form-note">本地演示不会产生真实预订；规划结果用于展示 Agent 工作流。</p>
+          </form>
+
+          <section class="agent-dock" id="agent-dock" aria-labelledby="agent-title">
+            <div class="dock-header"><div><p class="eyebrow">LIVE ORCHESTRATION</p><h3 id="agent-title">Agent 协作台</h3></div><span class="run-badge" id="run-badge">等待任务</span></div>
+            <div class="idle-state" id="idle-state">
+              <div class="orbit" aria-hidden="true"><i></i><i></i><i></i><strong>◎</strong></div>
+              <h4>团队已就位</h4>
+              <p>提交左侧旅行简报，实时查看 Supervisor 如何拆解目标、调用技能并验证约束。</p>
+            </div>
+            <div class="run-state" id="run-state" hidden>
+              <div class="agent-list" id="agent-list" aria-live="polite"></div>
+              <div class="progress-track"><i id="progress-bar"></i></div>
+              <p class="live-message" id="live-message">正在初始化工作流…</p>
+              <div class="trace-mini"><span>TRACE</span><code id="run-id">—</code><b id="trace-count">0 events</b></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="results" id="results" hidden aria-labelledby="results-title">
+        <div class="results-head">
+          <div><p class="eyebrow">YOUR SOUTHBOUND PLAN</p><h2 id="results-title">沿着夏天出发</h2><p id="results-summary">行程已生成。</p></div>
+          <div class="revision-card"><span>PLAN VERSION</span><strong id="revision">R1</strong><small id="updated-time">刚刚更新</small></div>
+        </div>
+        <div class="metric-strip" id="metrics"></div>
+        <div class="result-grid">
+          <div class="itinerary-panel"><div class="panel-title"><div><span>02</span><h3>每日路线</h3></div><small id="preservation-note"></small></div><div id="itinerary"></div></div>
+          <aside class="insight-column">
+            <section class="insight-card constraints-card"><div class="panel-title"><div><span>03</span><h3>约束体检</h3></div></div><div id="constraint-health"></div></section>
+            <section class="insight-card"><div class="panel-title"><div><span>04</span><h3>技能与证据</h3></div></div><div id="skills"></div><div class="evidence-list" id="evidence"></div></section>
+            <section class="storm-card"><p class="eyebrow">DISRUPTION DRILL</p><h3>如果天气突然变了？</h3><p>模拟一场夏季暴雨，观察 Agent 识别影响范围并尽量保留原计划。</p><button class="button storm-button" id="storm-button" type="button">模拟热带风暴 <span>↻</span></button><p id="storm-feedback" class="storm-feedback" aria-live="polite"></p></section>
+          </aside>
+        </div>
+        <details class="trace-panel"><summary><span>完整可解释追踪</span><small>展开查看每一步 Agent 决策</small></summary><ol id="trace-list"></ol></details>
+      </section>
+    </main>
+
+    <footer><div class="brand footer-brand"><span class="brand-mark" aria-hidden="true"><i></i></span><span><strong>TRIPOPS</strong><small>PLAN · VERIFY · RECOVER</small></span></div><p>Built for journeys that refuse to go exactly as planned.</p><a href="https://github.com/liuw55804-sys/tripops-agent" target="_blank" rel="noreferrer">View source on GitHub ↗</a></footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>

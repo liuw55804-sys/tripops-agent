@@ -7,6 +7,8 @@ uv sync --extra dev
 uv run tripops-api
 ```
 
+交互演示台位于 `http://127.0.0.1:9900/`，可完成创建行程、查看 Agent 实时进度、浏览结构化结果，以及注入夏季风暴并观察局部重规划。页面直接调用下述 API，无需 Node.js 或前端构建步骤。
+
 Swagger UI 位于 `http://127.0.0.1:9900/docs`。
 
 ## 创建任务

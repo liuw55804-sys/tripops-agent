@@ -6,6 +6,8 @@ from typing import cast
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
 from tripops import __version__
@@ -87,6 +89,14 @@ app = FastAPI(
     description="Constraint-driven travel planning and disruption recovery",
     lifespan=lifespan,
 )
+
+STATIC_DIR = Path(__file__).with_name("static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+
+@app.get("/", include_in_schema=False)
+async def web_app() -> FileResponse:
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 def _service(request: Request) -> TripOpsRunService:
