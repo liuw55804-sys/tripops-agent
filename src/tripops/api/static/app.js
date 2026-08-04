@@ -265,7 +265,7 @@ function subscribeToEvents(runId) {
         const traceEvent = JSON.parse(event.data);
         if (!state.trace.some((item) => item.event_id === traceEvent.event_id)) state.trace.push(traceEvent);
         renderTrace(state.trace);
-        const phase = traceEvent.attributes?.phase;
+        const phase = traceEvent.attributes?.next_phase || phaseFromTraceName(traceEvent.name);
         if (phaseMeta[phase]) renderAgents(phase);
         else $("#live-message").textContent = `${traceEvent.name} · ${traceEvent.status}`;
       } catch (error) { console.warn("Invalid SSE event", error); }
@@ -281,6 +281,15 @@ function subscribeToEvents(runId) {
     }
   });
   source.onerror = () => source.close();
+}
+
+function phaseFromTraceName(name) {
+  if (name === "planner") return "plan";
+  if (name.startsWith("researcher:")) return "research";
+  if (name === "verifier") return "verify";
+  if (name === "impact_analyzer") return "replan";
+  if (name === "finalizer") return "finish";
+  return null;
 }
 
 function formPayload() {
