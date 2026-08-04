@@ -88,6 +88,12 @@ async def test_structured_planner_augments_required_research_and_schedules() -> 
                 capability="poi_search",
                 rationale="match culture preference",
             ),
+            ResearchTaskDraft(
+                id="activities-backup",
+                title="Research alternative cultural activities",
+                capability="poi_search",
+                rationale="provide a weather-safe alternative",
+            ),
         ),
         planning_focus=("culture",),
         assumptions=("offline candidate catalog",),
@@ -105,6 +111,7 @@ async def test_structured_planner_augments_required_research_and_schedules() -> 
         "poi_search",
         "restaurant_search",
     }
+    assert len(plan.steps) == 5
     assert len(plan.itinerary) == 6
     assert all(item.metadata["planner_focus"] == ("culture",) for item in plan.itinerary)
     assert budget.snapshot()["model_calls"] == 1

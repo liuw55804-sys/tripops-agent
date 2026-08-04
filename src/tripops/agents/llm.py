@@ -45,9 +45,6 @@ class PlannerDraft(BaseModel):
         ids = [task.id for task in self.tasks]
         if len(ids) != len(set(ids)):
             raise ValueError("planner task ids must be unique")
-        capabilities = [task.capability for task in self.tasks]
-        if len(capabilities) != len(set(capabilities)):
-            raise ValueError("planner capabilities must be unique")
         known = set(ids)
         for task in self.tasks:
             if task.capability not in ALLOWED_CAPABILITIES:
