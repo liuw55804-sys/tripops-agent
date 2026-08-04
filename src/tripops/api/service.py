@@ -94,6 +94,7 @@ class TripOpsRunService:
             updated_at=record.updated_at,
             plan=state.get("plan"),
             evidence=tuple(state.get("evidence", [])),
+            selected_skills=tuple(state.get("selected_skills", [])),
             violations=tuple(state.get("violations", [])),
             pending_approval=state.get("pending_approval"),
             final_response=state.get("final_response"),

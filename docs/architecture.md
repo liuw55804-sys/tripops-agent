@@ -5,6 +5,8 @@
 ```mermaid
 flowchart TD
     API[FastAPI / SSE] --> SUP[Supervisor]
+    SUP --> SKILL[Skill summary selection]
+    SKILL -->|load selected bodies| PLAN
     SUP --> INTAKE[Requirement Intake]
     SUP --> PLAN[Planner]
     PLAN --> R1[Transport Researcher]
@@ -31,10 +33,12 @@ flowchart TD
 | Long-term Store | 跨线程 | 用户偏好、历史选择、常用出发地 | Memory service |
 | Artifact Store | 按保留策略 | 网页、工具原始响应、长报告 | Tools/Researchers |
 
+`ContextCompiler` 在模型调用前把四层数据编译成有界 envelope：Violation 和结构化 Request 优先；Evidence 按 confidence、freshness 和数量过滤；大结果只携带 `artifact://` 引用；每个被截断的 section 都进入审计字段。
+
 ## Agent 边界
 
 - Supervisor 不直接搜索，也不直接生成完整行程，只决定控制流。
-- Planner 不调用外部事实工具，只构造或修订任务 DAG。
+- Planner 不调用外部事实工具，只构造或修订任务 DAG；确定性 Scheduler 负责候选硬过滤、时间槽、预算和 Jain fairness。
 - Researcher 只能输出 `Evidence`，不能修改计划或宣布任务完成。
 - Verifier 只消费结构化行程、约束和证据，输出 `Violation`。
 - 确定性校验优先；只有主观偏好和证据充分性允许模型辅助判断。
@@ -51,8 +55,16 @@ flowchart TD
 ## 关键设计决策
 
 - 使用 LangGraph 自定义主图，而不是将控制流完全交给通用 ReAct 循环。
-- 叶子 Agent 使用 LangChain `create_agent`，共享统一 Middleware 契约。
+- `offline` 模式使用规则 Agent 保证无密钥复现；`llm` 模式使用 LangChain structured output，边界仍为 Pydantic。
+- LangChain Middleware 契约覆盖 Skills 注入、动态工具最小暴露、模型预算和受治理工具执行，可供叶子 `create_agent` 复用。
 - 使用 Pydantic 模型作为节点边界，禁止用自由文本模拟状态机。
 - 首版 checkpoint 采用 SQLite；接口保持可替换，生产化时可切 PostgreSQL。
 - 首版保留 Milvus 兼容能力，关键词索引和融合层保持存储无关。
 
+## 规划与局部修订
+
+候选目录先根据排除活动、安全属性做硬过滤，再按 required activity、每位旅客的边际偏好覆盖、对当前最少满足成员的公平增益和成本排序。每个 item 保存候选、slot、匹配偏好和选择分数。发生 disruption 后，Impact Analyzer 沿时间和任务 DAG 传播影响；Scheduler 按 `slot_key` 原样保留 `preserved_item_ids`，只为受影响 slot 生成新 revision。API 集成测试验证 15 项行程中只替换 3 项并保留 12 项。
+
+## RAG 数据生命周期
+
+`DocumentChunker` 负责规范化、稳定 ID、重叠分块、内容去重及 volatility freshness；`HybridCorpus` 原子替换版本化快照。查询并行执行 BM25 与 Dense，RRF 融合后通过 lexical fallback 或 CrossEncoder 重排，最终 Citation 保留 URI、抓取时间、有效期和 chunk ID。

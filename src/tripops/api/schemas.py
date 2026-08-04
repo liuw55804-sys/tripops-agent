@@ -41,6 +41,7 @@ class RunView(BaseModel):
     updated_at: datetime
     plan: TravelPlan | None = None
     evidence: tuple[Evidence, ...] = ()
+    selected_skills: tuple[str, ...] = ()
     violations: tuple[Violation, ...] = ()
     pending_approval: ApprovalRequest | None = None
     final_response: str | None = None

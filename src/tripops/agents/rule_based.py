@@ -1,11 +1,14 @@
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import cast
 
 from tripops.agents.models import ResearchResult, ResearchTask, SupervisorDecision
+from tripops.constraints import RepairScope
 from tripops.context.state import TripOpsState, WorkflowPhase
 from tripops.domain.evidence import Evidence, EvidenceSource
 from tripops.domain.plan import PlanStep, TravelPlan
 from tripops.domain.violations import Violation
+from tripops.planning import ConstraintAwareScheduler
 
 
 class RuleBasedSupervisor:
@@ -61,12 +64,17 @@ class RuleBasedSupervisor:
 
 
 class RuleBasedPlanner:
-    """Small offline planner; production wiring replaces it with a structured-output Agent."""
+    """Constraint-aware offline planner used by the reproducible demo path."""
+
+    def __init__(self, scheduler: ConstraintAwareScheduler | None = None) -> None:
+        self.scheduler = scheduler or ConstraintAwareScheduler()
 
     async def plan(self, state: TripOpsState) -> TravelPlan:
         request = state["request"]
         previous = state.get("plan")
         revision = 1 if previous is None else previous.revision + 1
+        raw_scope = cast(dict[str, object], state).get("repair_scope")
+        repair_scope = raw_scope if isinstance(raw_scope, RepairScope) else None
         steps = (
             PlanStep(
                 id=f"r{revision}-transport",
@@ -86,12 +94,32 @@ class RuleBasedPlanner:
                 capability="policy_search",
                 assigned_agent="policy_researcher",
             ),
+            PlanStep(
+                id=f"r{revision}-poi",
+                title="Research activities and opening windows",
+                capability="poi_search",
+                assigned_agent="poi_researcher",
+            ),
+            PlanStep(
+                id=f"r{revision}-restaurant",
+                title="Research dietary-safe restaurants",
+                capability="restaurant_search",
+                assigned_agent="restaurant_researcher",
+            ),
         )
+        itinerary, _ = self.scheduler.schedule(
+            request,
+            revision=revision,
+            previous_items=previous.itinerary if previous else (),
+            repair_scope=repair_scope,
+        )
+        estimated_total = sum((item.cost for item in itinerary), start=Decimal("0"))
         return TravelPlan(
             trip_id=request.id,
             revision=revision,
             steps=steps,
-            estimated_total_cost=previous.estimated_total_cost if previous else Decimal("0"),
+            itinerary=itinerary,
+            estimated_total_cost=estimated_total,
             currency=request.currency,
         )
 

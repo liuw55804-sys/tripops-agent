@@ -1,6 +1,6 @@
 {
   "suite_name": "tripops-travelplanner-v1",
-  "generated_at": "2026-08-04T14:34:42.596893+00:00",
+  "generated_at": "2026-08-04T14:57:35.086269+00:00",
   "summary": {
     "case_count": 80,
     "hard_constraint_pass_rate": 0.4375,
@@ -14,7 +14,7 @@
     "affected_item_recall": 1.0,
     "plan_preservation": 1.0,
     "degradation_success_rate": 1.0,
-    "average_latency_ms": 0.3512140752718551
+    "average_latency_ms": 0.3498671761917649
   },
   "by_category": {
     "standard": {
@@ -30,7 +30,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success_rate": 1.0,
-      "average_latency_ms": 0.02434580004774034
+      "average_latency_ms": 0.025438281300012022
     },
     "dynamic": {
       "case_count": 20,
@@ -45,7 +45,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success_rate": 1.0,
-      "average_latency_ms": 0.0159542505571153
+      "average_latency_ms": 0.015418850671267137
     },
     "fault": {
       "case_count": 10,
@@ -60,7 +60,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success_rate": 1.0,
-      "average_latency_ms": 2.6560751008219086
+      "average_latency_ms": 2.6409083016915247
     }
   },
   "results": [
@@ -80,7 +80,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.186416000360623
+      "latency_ms": 0.23629199131391943
     },
     {
       "case_id": "standard-01",
@@ -102,7 +102,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.057249999372288585
+      "latency_ms": 0.05433299520518631
     },
     {
       "case_id": "standard-02",
@@ -124,7 +124,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.03420800203457475
+      "latency_ms": 0.031625007977709174
     },
     {
       "case_id": "standard-03",
@@ -146,7 +146,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.02779200440272689
+      "latency_ms": 0.026917012291960418
     },
     {
       "case_id": "standard-04",
@@ -168,7 +168,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.023499989765696228
+      "latency_ms": 0.022499996703118086
     },
     {
       "case_id": "standard-05",
@@ -190,7 +190,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.028583002858795226
+      "latency_ms": 0.03199999628122896
     },
     {
       "case_id": "standard-06",
@@ -212,7 +212,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.02358300844207406
+      "latency_ms": 0.023667002096772194
     },
     {
       "case_id": "standard-07",
@@ -234,7 +234,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.027375004719942808
+      "latency_ms": 0.02745899837464094
     },
     {
       "case_id": "standard-08",
@@ -256,7 +256,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.02333299198653549
+      "latency_ms": 0.022625012206844985
     },
     {
       "case_id": "standard-09",
@@ -278,7 +278,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.018749997252598405
+      "latency_ms": 0.018582999473437667
     },
     {
       "case_id": "standard-10",
@@ -296,7 +296,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.015958008589223027
+      "latency_ms": 0.016250007320195436
     },
     {
       "case_id": "standard-11",
@@ -318,7 +318,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.020625011529773474
+      "latency_ms": 0.02462499833200127
     },
     {
       "case_id": "standard-12",
@@ -340,7 +340,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.017625003238208592
+      "latency_ms": 0.020166000467725098
     },
     {
       "case_id": "standard-13",
@@ -362,7 +362,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.017207989003509283
+      "latency_ms": 0.02183300966862589
     },
     {
       "case_id": "standard-14",
@@ -384,7 +384,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01633400097489357
+      "latency_ms": 0.029082992114126682
     },
     {
       "case_id": "standard-15",
@@ -406,7 +406,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.05020799289923161
+      "latency_ms": 0.02229200617875904
     },
     {
       "case_id": "standard-16",
@@ -428,7 +428,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.021333005861379206
+      "latency_ms": 0.019583007087931037
     },
     {
       "case_id": "standard-17",
@@ -450,7 +450,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.0219999928958714
+      "latency_ms": 0.030125011107884347
     },
     {
       "case_id": "standard-18",
@@ -472,7 +472,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.019708997569978237
+      "latency_ms": 0.022249994799494743
     },
     {
       "case_id": "standard-19",
@@ -494,7 +494,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01750000228639692
+      "latency_ms": 0.017750004190020263
     },
     {
       "case_id": "standard-20",
@@ -512,7 +512,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014666991773992777
+      "latency_ms": 0.015416997484862804
     },
     {
       "case_id": "standard-21",
@@ -534,7 +534,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01979200169444084
+      "latency_ms": 0.020209001377224922
     },
     {
       "case_id": "standard-22",
@@ -556,7 +556,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.017750004190020263
+      "latency_ms": 0.018165999790653586
     },
     {
       "case_id": "standard-23",
@@ -578,7 +578,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01824999344535172
+      "latency_ms": 0.017790996935218573
     },
     {
       "case_id": "standard-24",
@@ -600,7 +600,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01650000922381878
+      "latency_ms": 0.01795800926629454
     },
     {
       "case_id": "standard-25",
@@ -622,7 +622,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.019166007405146956
+      "latency_ms": 0.027832997147925198
     },
     {
       "case_id": "standard-26",
@@ -644,7 +644,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.0212500017369166
+      "latency_ms": 0.019208004232496023
     },
     {
       "case_id": "standard-27",
@@ -666,7 +666,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.02187499194405973
+      "latency_ms": 0.019500002963468432
     },
     {
       "case_id": "standard-28",
@@ -688,7 +688,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.019416998839005828
+      "latency_ms": 0.017416998161934316
     },
     {
       "case_id": "standard-29",
@@ -710,7 +710,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014749995898455381
+      "latency_ms": 0.015000012353993952
     },
     {
       "case_id": "standard-30",
@@ -728,7 +728,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.012999997125007212
+      "latency_ms": 0.01274999522138387
     },
     {
       "case_id": "standard-31",
@@ -750,7 +750,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.029166010790504515
+      "latency_ms": 0.01966700074262917
     },
     {
       "case_id": "standard-32",
@@ -772,7 +772,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01575000351294875
+      "latency_ms": 0.019708997569978237
     },
     {
       "case_id": "standard-33",
@@ -794,7 +794,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01591698674019426
+      "latency_ms": 0.020957988454028964
     },
     {
       "case_id": "standard-34",
@@ -816,7 +816,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014999997802078724
+      "latency_ms": 0.01691700890660286
     },
     {
       "case_id": "standard-35",
@@ -838,7 +838,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01750000228639692
+      "latency_ms": 0.019915998564101756
     },
     {
       "case_id": "standard-36",
@@ -860,7 +860,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.018457998521625996
+      "latency_ms": 0.018082995666190982
     },
     {
       "case_id": "standard-37",
@@ -882,7 +882,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01937500201165676
+      "latency_ms": 0.018875012756325305
     },
     {
       "case_id": "standard-38",
@@ -904,7 +904,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.018000006093643606
+      "latency_ms": 0.017625003238208592
     },
     {
       "case_id": "standard-39",
@@ -926,7 +926,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01633398642297834
+      "latency_ms": 0.01641598646529019
     },
     {
       "case_id": "standard-40",
@@ -944,7 +944,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014124991139397025
+      "latency_ms": 0.014375007594935596
     },
     {
       "case_id": "standard-41",
@@ -966,7 +966,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.029125003493390977
+      "latency_ms": 0.019332990632392466
     },
     {
       "case_id": "standard-42",
@@ -988,7 +988,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.017291997210122645
+      "latency_ms": 0.017874990589916706
     },
     {
       "case_id": "standard-43",
@@ -1010,7 +1010,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.017875005141831934
+      "latency_ms": 0.017625003238208592
     },
     {
       "case_id": "standard-44",
@@ -1032,7 +1032,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.016332996892742813
+      "latency_ms": 0.01666600292082876
     },
     {
       "case_id": "standard-45",
@@ -1054,7 +1054,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01891700958367437
+      "latency_ms": 0.0187920086318627
     },
     {
       "case_id": "standard-46",
@@ -1076,7 +1076,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01812499249354005
+      "latency_ms": 0.019041006453335285
     },
     {
       "case_id": "standard-47",
@@ -1098,7 +1098,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01954101026058197
+      "latency_ms": 0.020541003323160112
     },
     {
       "case_id": "standard-48",
@@ -1120,7 +1120,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01854199217632413
+      "latency_ms": 0.020709005184471607
     },
     {
       "case_id": "standard-49",
@@ -1142,7 +1142,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01620801049284637
+      "latency_ms": 0.017583995941095054
     },
     {
       "case_id": "dynamic-00",
@@ -1160,7 +1160,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.020500010577961802
+      "latency_ms": 0.019500002963468432
     },
     {
       "case_id": "dynamic-01",
@@ -1178,7 +1178,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.018457998521625996
+      "latency_ms": 0.015083001926541328
     },
     {
       "case_id": "dynamic-02",
@@ -1196,7 +1196,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.016582998796366155
+      "latency_ms": 0.014250006643123925
     },
     {
       "case_id": "dynamic-03",
@@ -1214,7 +1214,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.015416007954627275
+      "latency_ms": 0.01462499494664371
     },
     {
       "case_id": "dynamic-04",
@@ -1232,7 +1232,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014833000022917986
+      "latency_ms": 0.014208999346010387
     },
     {
       "case_id": "dynamic-05",
@@ -1250,7 +1250,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.017917001969181
+      "latency_ms": 0.015500001609325409
     },
     {
       "case_id": "dynamic-06",
@@ -1268,7 +1268,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.018292004824616015
+      "latency_ms": 0.014833000022917986
     },
     {
       "case_id": "dynamic-07",
@@ -1286,7 +1286,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.0195419997908175
+      "latency_ms": 0.015291996533051133
     },
     {
       "case_id": "dynamic-08",
@@ -1304,7 +1304,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.018250007997266948
+      "latency_ms": 0.014709003153257072
     },
     {
       "case_id": "dynamic-09",
@@ -1322,7 +1322,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.017124999430961907
+      "latency_ms": 0.016624995623715222
     },
     {
       "case_id": "dynamic-10",
@@ -1340,7 +1340,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.013083990779705346
+      "latency_ms": 0.01604200224392116
     },
     {
       "case_id": "dynamic-11",
@@ -1358,7 +1358,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.01345899363514036
+      "latency_ms": 0.014709003153257072
     },
     {
       "case_id": "dynamic-12",
@@ -1376,7 +1376,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.013791999663226306
+      "latency_ms": 0.014833000022917986
     },
     {
       "case_id": "dynamic-13",
@@ -1394,7 +1394,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014582998119294643
+      "latency_ms": 0.014375007594935596
     },
     {
       "case_id": "dynamic-14",
@@ -1412,7 +1412,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014582998119294643
+      "latency_ms": 0.014667006325908005
     },
     {
       "case_id": "dynamic-15",
@@ -1430,7 +1430,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014500008546747267
+      "latency_ms": 0.0145840022014454
     },
     {
       "case_id": "dynamic-16",
@@ -1448,7 +1448,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014833989553153515
+      "latency_ms": 0.014499993994832039
     },
     {
       "case_id": "dynamic-17",
@@ -1466,7 +1466,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014625009498558939
+      "latency_ms": 0.014582998119294643
     },
     {
       "case_id": "dynamic-18",
@@ -1484,7 +1484,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014499993994832039
+      "latency_ms": 0.01462499494664371
     },
     {
       "case_id": "dynamic-19",
@@ -1502,7 +1502,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.014208999346010387
+      "latency_ms": 0.02083300205413252
     },
     {
       "case_id": "fault-00",
@@ -1520,7 +1520,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 12.486459003412165
+      "latency_ms": 13.495666004018858
     },
     {
       "case_id": "fault-01",
@@ -1538,7 +1538,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.26212500233668834
+      "latency_ms": 0.2789999998640269
     },
     {
       "case_id": "fault-02",
@@ -1556,7 +1556,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.18191701383329928
+      "latency_ms": 0.2712499990593642
     },
     {
       "case_id": "fault-03",
@@ -1574,7 +1574,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.2307499962626025
+      "latency_ms": 0.1809170062188059
     },
     {
       "case_id": "fault-04",
@@ -1592,7 +1592,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.16170799790415913
+      "latency_ms": 0.16916700406000018
     },
     {
       "case_id": "fault-05",
@@ -1610,7 +1610,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 12.407458008965477
+      "latency_ms": 11.320124991470948
     },
     {
       "case_id": "fault-06",
@@ -1628,7 +1628,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.28774999373126775
+      "latency_ms": 0.2158330025849864
     },
     {
       "case_id": "fault-07",
@@ -1646,7 +1646,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.2094999945256859
+      "latency_ms": 0.15970799722708762
     },
     {
       "case_id": "fault-08",
@@ -1664,7 +1664,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.17591699725016952
+      "latency_ms": 0.16229200991801918
     },
     {
       "case_id": "fault-09",
@@ -1682,7 +1682,7 @@
       "affected_item_recall": 1.0,
       "plan_preservation": 1.0,
       "degradation_success": true,
-      "latency_ms": 0.1571669999975711
+      "latency_ms": 0.15512500249315053
     }
   ]
 }

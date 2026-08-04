@@ -52,7 +52,8 @@ API 启动后访问 `http://127.0.0.1:9900/docs`。离线模式不需要模型 A
 
 ## 可验证结果
 
-- 53 个自动化测试，语句/分支综合覆盖率 89.25%。
+- 86 个自动化测试，语句/分支综合覆盖率 89.94%。
+- 约 9.36k 行有效 Python（源码、测试与 MCP Mock），仓库首个提交共 12k+ 行。
 - 50 个标准约束、20 个动态变更、10 个故障注入案例。
 - 基线中 labelled violation F1、citation correctness/freshness、局部影响召回、原计划保留和 fallback 成功率均为 100%。
 - 评测指标只证明确定性工程链路，不将离线 fixture 结果包装成线上 LLM 效果；详见 [评测报告](docs/evaluation-report.md)。
@@ -67,7 +68,11 @@ src/tripops/
 ├── context/         # runtime/state/memory/artifact/checkpoint
 ├── evaluation/      # 80-case benchmark、指标和故障探针
 ├── middleware/      # hooks、权限、预算、重试、熔断、fallback
-├── rag/             # BM25/dense/RRF/rerank/citation
+├── models/          # OpenAI-compatible 模型工厂
+├── planning/        # 候选目录、多人公平评分和约束感知调度
+├── rag/             # ingestion/BM25/dense/RRF/rerank/citation
 ├── skills/          # 渐进加载的 Skill Registry
 └── tools/           # Tool Registry 与 MCP discovery
 ```
+
+默认 `TRIPOPS_AGENT_MODE=offline`，用于无密钥复现。切换为 `llm` 后，Supervisor 与 Planner 使用 LangChain structured output；LLM 只提出路由和研究 DAG，最终 itinerary 仍由确定性调度器构造并由 Verifier 裁决。

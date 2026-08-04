@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     environment: Literal["local", "test", "staging", "production"] = "local"
     log_level: str = "INFO"
+    agent_mode: Literal["offline", "llm"] = "offline"
 
     model_provider: Literal["openai_compatible"] = "openai_compatible"
     model_name: str = "qwen-plus"
@@ -33,4 +34,3 @@ class Settings(BaseSettings):
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     return Settings()
-

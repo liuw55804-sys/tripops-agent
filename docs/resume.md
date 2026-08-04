@@ -6,7 +6,7 @@
 
 ## 简历表述
 
-> 基于 Python、LangChain v1 与 LangGraph 构建 Supervisor/Planner/Researcher/Verifier 多智能体旅行运维系统；设计 Skills 渐进加载、MCP 动态工具治理与四层上下文，使用 BM25 + Dense + RRF + 语义重排生成可追溯证据，并以确定性规则校验预算、时间窗、通勤、饮食及无障碍硬约束。实现 checkpoint 断点恢复、人工审批、影响范围分析与局部重规划，以及 timeout/retry/cache/circuit-breaker/fallback 全链路降级；建立 80-case 离线评测与故障注入集，53 项测试覆盖率 89.25%。
+> 基于 Python、LangChain v1 与 LangGraph 构建 Supervisor/Planner/Researcher/Verifier 多智能体旅行运维系统；设计 Skills 渐进加载、MCP 动态工具治理与四层上下文，使用 BM25 + Dense + RRF + 语义重排生成可追溯证据，并以确定性规则校验预算、时间窗、通勤、饮食及无障碍硬约束。实现 checkpoint 断点恢复、人工审批、影响范围分析与局部重规划，以及 timeout/retry/cache/circuit-breaker/fallback 全链路降级；建立 80-case 离线评测与故障注入集，86 项测试覆盖率 89.94%。
 
 ## 面试时应主动限定的结论
 

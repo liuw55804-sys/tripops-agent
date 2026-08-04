@@ -63,7 +63,8 @@ class ImpactAnalyzer:
             required_capabilities=tuple(sorted(capabilities)),
             reasons=tuple(reasons),
             local_repair=(
-                bool(affected_items or affected_steps) and len(affected_items) < len(all_items)
+                bool(affected_items or affected_steps)
+                and (not all_items or len(affected_items) < len(all_items))
             ),
         )
 

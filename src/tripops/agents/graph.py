@@ -28,6 +28,7 @@ from tripops.observability import (
     emit_trace,
     trace_span,
 )
+from tripops.skills import SkillSelectionPolicy
 
 
 class GraphState(TripOpsState, total=False):
@@ -107,6 +108,7 @@ def build_tripops_graph(
     impact_analyzer: ImpactAnalyzer | None = None,
     trace_sink: TraceSink | None = None,
     checkpointer: Any | None = None,
+    skill_selector: SkillSelectionPolicy | None = None,
 ) -> TripOpsGraph:
     render_final = finalizer or _default_finalizer
     analyzer = impact_analyzer or ImpactAnalyzer()
@@ -129,13 +131,22 @@ def build_tripops_graph(
         return update
 
     async def planner_node(state: GraphState) -> dict[str, Any]:
+        selected_skills = list(state.get("selected_skills", []))
+        planning_state = state
+        if skill_selector is not None:
+            selection = skill_selector.select_for_planner(cast(TripOpsState, state))
+            selected_skills = list(selection.names)
+            planning_state = cast(
+                GraphState,
+                {**state, "selected_skills": selected_skills},
+            )
         with trace_span(
             traces,
             run_id=state["run_id"],
             kind=TraceKind.AGENT,
             name="planner",
         ):
-            plan = await planner.plan(cast(TripOpsState, state))
+            plan = await planner.plan(cast(TripOpsState, planning_state))
         if not plan.steps:
             return {"phase": WorkflowPhase.FAILED, "error": "planner returned no steps"}
         for step in plan.steps:
@@ -152,6 +163,7 @@ def build_tripops_graph(
             "phase": WorkflowPhase.RESEARCH,
             "violations": [],
             "verification_complete": False,
+            "selected_skills": selected_skills,
             "required_capabilities": sorted({step.capability for step in plan.steps}),
         }
 
@@ -305,11 +317,22 @@ def build_tripops_graph(
         plan = state["plan"]
         steps = plan.steps
         repair_scope = state.get("repair_scope")
-        if plan.revision > 1 and repair_scope and repair_scope.required_capabilities:
+        if (
+            plan.revision > 1
+            and repair_scope
+            and repair_scope.local_repair
+            and repair_scope.required_capabilities
+        ):
+            known_evidence_ids = {item.id for item in state.get("evidence", [])}
+            referenced_evidence_ids = {
+                evidence_id for item in plan.itinerary for evidence_id in item.evidence_ids
+            }
+            missing_evidence_ids = referenced_evidence_ids - known_evidence_ids
             local_steps = tuple(
                 step
                 for step in steps
                 if step.capability in set(repair_scope.required_capabilities)
+                or f"ev-{step.id}" in missing_evidence_ids
             )
             if local_steps:
                 steps = local_steps

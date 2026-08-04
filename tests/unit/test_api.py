@@ -49,6 +49,11 @@ def test_run_lifecycle_trace_and_sse() -> None:
     assert completed["status"] == "completed"
     assert completed["phase"] == "finish"
     assert completed["plan"]["revision"] == 1
+    assert len(completed["plan"]["itinerary"]) == 15
+    assert len(completed["evidence"]) == 5
+    assert set(completed["selected_skills"]) == {
+        "itinerary-optimization",
+    }
     assert completed["trace_event_count"] > 0
     assert trace.status_code == 200
     assert any(event["name"] == "supervisor" for event in trace.json()["events"])
@@ -58,7 +63,8 @@ def test_run_lifecycle_trace_and_sse() -> None:
 def test_completed_run_accepts_disruption_and_replans() -> None:
     with TestClient(app) as client:
         run_id = client.post("/v1/runs", json={"request": _trip_payload()}).json()["run_id"]
-        _wait_for_terminal(client, run_id)
+        initial = _wait_for_terminal(client, run_id)
+        initial_ids = {item["id"] for item in initial["plan"]["itinerary"]}
         response = client.post(
             f"/v1/runs/{run_id}/disruptions",
             json={
@@ -67,6 +73,8 @@ def test_completed_run_accepts_disruption_and_replans() -> None:
                     "event_type": "severe_weather",
                     "description": "Typhoon disrupts rail services",
                     "locations": ["Kyoto"],
+                    "starts_at": "2030-10-01T08:00:00Z",
+                    "ends_at": "2030-10-01T11:00:00Z",
                     "required_capabilities": ["weather_search", "transport_search"],
                 }
             },
@@ -76,6 +84,9 @@ def test_completed_run_accepts_disruption_and_replans() -> None:
 
     assert completed["status"] == "completed"
     assert completed["plan"]["revision"] == 2
+    revised_ids = {item["id"] for item in completed["plan"]["itinerary"]}
+    assert len(initial_ids & revised_ids) == 12
+    assert len(revised_ids - initial_ids) == 3
 
 
 def test_unknown_run_and_invalid_approval_are_explicit() -> None:

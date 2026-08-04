@@ -1,7 +1,7 @@
 # TripOps Offline Evaluation
 
 - Suite: `tripops-travelplanner-v1`
-- Generated at: `2026-08-04T14:34:42.596893+00:00`
+- Generated at: `2026-08-04T14:57:35.086269+00:00`
 - Cases: **80**
 
 ## Headline metrics

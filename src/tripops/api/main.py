@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import cast
 
 import uvicorn
@@ -9,6 +10,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from tripops import __version__
 from tripops.agents import build_tripops_graph
+from tripops.agents.llm import StructuredPlanner, StructuredSupervisor
 from tripops.agents.router import ResearcherRouter
 from tripops.agents.rule_based import (
     RuleBasedPlanner,
@@ -27,8 +29,10 @@ from tripops.api.schemas import (
 from tripops.api.service import RunConflict, RunNotFound, TripOpsRunService
 from tripops.config import get_settings
 from tripops.constraints import DeterministicConstraintVerifier
-from tripops.context import open_sqlite_checkpointer
+from tripops.context import RunBudget, open_sqlite_checkpointer
+from tripops.models import build_chat_model
 from tripops.observability import InMemoryTraceSink
+from tripops.skills import SkillRegistry, SkillSelectionPolicy
 
 
 @asynccontextmanager
@@ -37,6 +41,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings.checkpoint_db.parent.mkdir(parents=True, exist_ok=True)
     settings.artifact_dir.mkdir(parents=True, exist_ok=True)
     trace_sink = InMemoryTraceSink()
+    skill_registry = SkillRegistry((Path("skills"),))
+    skill_registry.discover()
+    skill_selector = SkillSelectionPolicy(skill_registry)
     researcher = StaticEvidenceResearcher(
         "offline_researcher",
         frozenset(
@@ -49,13 +56,24 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         ),
     )
     async with open_sqlite_checkpointer(settings.checkpoint_db) as checkpointer:
+        supervisor: RuleBasedSupervisor | StructuredSupervisor
+        planner: RuleBasedPlanner | StructuredPlanner
+        if settings.agent_mode == "llm":
+            model = build_chat_model(settings)
+            model_budget = RunBudget()
+            supervisor = StructuredSupervisor(model, model_budget)
+            planner = StructuredPlanner(model, model_budget, skill_registry=skill_registry)
+        else:
+            supervisor = RuleBasedSupervisor()
+            planner = RuleBasedPlanner()
         graph = build_tripops_graph(
-            supervisor=RuleBasedSupervisor(),
-            planner=RuleBasedPlanner(),
+            supervisor=supervisor,
+            planner=planner,
             researcher_router=ResearcherRouter((researcher,)),
             verifier=DeterministicConstraintVerifier(),
             trace_sink=trace_sink,
             checkpointer=checkpointer,
+            skill_selector=skill_selector,
         )
         service = TripOpsRunService(graph, trace_sink)
         app.state.run_service = service
