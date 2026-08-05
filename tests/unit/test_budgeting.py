@@ -86,7 +86,7 @@ def quote_evidence() -> tuple[Evidence, ...]:
         evidence(
             "stale",
             "transport_search",
-            "Sydney to Melbourne",
+            "Sydney flight to Melbourne",
             "Departing 2027 from AUD $80",
             "https://air.example/stale",
         ),

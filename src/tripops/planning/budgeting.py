@@ -1,5 +1,4 @@
 import re
-from collections import defaultdict
 from datetime import UTC, datetime
 from decimal import Decimal
 from hashlib import sha1
@@ -71,40 +70,45 @@ class WebQuoteExtractor:
             kind = self._kind(capability)
             if kind is None or item.source_uri is None:
                 continue
-            searchable = f'{item.metadata.get("search_title", "")}\n{item.claim}'
-            matches = list(PRICE_PATTERN.finditer(searchable))
+            title = str(item.metadata.get("search_title") or item.claim[:90]).strip()
+            title_matches = list(PRICE_PATTERN.finditer(title))
+            searchable = title if title_matches else item.claim
+            matches = title_matches or list(PRICE_PATTERN.finditer(item.claim))
             if not matches:
                 continue
-            grouped: dict[str, list[Decimal]] = defaultdict(list)
-            for match in matches:
-                currency = self._currency(match.group("currency"), str(item.source_uri))
-                if currency is not None:
-                    grouped[currency].append(Decimal(match.group("amount").replace(",", "")))
-            for currency, amounts in grouped.items():
-                positive = [amount for amount in amounts if amount > 0]
-                if not positive:
-                    continue
-                location = self._location(request, item)
-                status, reason = self._status(request, item, location)
-                title = str(item.metadata.get("search_title") or item.claim[:90]).strip()
-                quote_key = f"{item.id}:{currency}:{min(positive)}:{max(positive)}"
-                quotes.append(
-                    QuoteFact(
-                        id=f"quote-{sha1(quote_key.encode()).hexdigest()[:12]}",
-                        kind=kind,
-                        title=title,
-                        location=location,
-                        amount_low=min(positive),
-                        amount_high=max(positive),
-                        currency=currency,
-                        unit=self._unit(kind),
-                        status=status,
-                        source_uri=item.source_uri,
-                        evidence_id=item.id,
-                        observed_at=item.retrieved_at,
-                        rejection_reason=reason,
-                    )
+            match = matches[0]
+            currency = self._currency(match.group("currency"), str(item.source_uri))
+            if currency is None:
+                continue
+            amount_low = Decimal(match.group("amount").replace(",", ""))
+            amount_high = amount_low
+            if len(matches) > 1:
+                connector = searchable[match.end() : matches[1].start()].casefold()
+                next_currency = self._currency(matches[1].group("currency"), str(item.source_uri))
+                if next_currency == currency and re.search(r"\bto\b|[-–—至到]", connector):
+                    amount_high = Decimal(matches[1].group("amount").replace(",", ""))
+            if amount_low <= 0 or amount_high <= 0:
+                continue
+            location = self._location(request, item)
+            status, reason = self._status(request, item, location, kind)
+            quote_key = f"{item.id}:{currency}:{amount_low}:{amount_high}"
+            quotes.append(
+                QuoteFact(
+                    id=f"quote-{sha1(quote_key.encode()).hexdigest()[:12]}",
+                    kind=kind,
+                    title=title,
+                    location=location,
+                    amount_low=min(amount_low, amount_high),
+                    amount_high=max(amount_low, amount_high),
+                    currency=currency,
+                    unit=self._unit(kind),
+                    status=status,
+                    source_uri=item.source_uri,
+                    evidence_id=item.id,
+                    observed_at=item.retrieved_at,
+                    rejection_reason=reason,
                 )
+            )
         return tuple(quotes)
 
     @staticmethod
@@ -153,8 +157,20 @@ class WebQuoteExtractor:
         request: TripRequest,
         evidence: Evidence,
         location: str | None,
+        kind: QuoteKind,
     ) -> tuple[QuoteStatus, str | None]:
         text = f"{evidence.metadata.get('search_title', '')} {evidence.claim}".casefold()
+        required_terms = {
+            QuoteKind.ACCOMMODATION: ("hotel", "accommodation", "住宿", "酒店"),
+            QuoteKind.TRANSPORT: ("flight", "fare", "train", "bus", "机票", "航班", "火车"),
+            QuoteKind.RESTAURANT: ("restaurant", "menu", "dining", "餐厅", "菜单", "人均"),
+        }[kind]
+        if not any(term in text for term in required_terms):
+            return QuoteStatus.REJECTED, f"source content does not match {kind.value}"
+        if kind is QuoteKind.RESTAURANT and any(
+            term in text for term in ("flight", "airfare", "航班", "机票")
+        ):
+            return QuoteStatus.REJECTED, "flight result was returned for a restaurant query"
         years = {int(value) for value in YEAR_PATTERN.findall(text)}
         if years and request.start_date.year not in years:
             return QuoteStatus.REJECTED, "source dates do not match the trip year"
@@ -327,11 +343,12 @@ class EvidenceBudgetBuilder:
 
     @staticmethod
     def _room_count(request: TripRequest) -> int:
-        match = ROOM_PATTERN.search(request.raw_requirement)
-        if match:
-            raw = match.group(1)
+        explicit_counts = []
+        for raw in ROOM_PATTERN.findall(request.raw_requirement):
             if raw.isdigit():
-                return max(1, int(raw))
-            if raw in CHINESE_NUMBERS:
-                return CHINESE_NUMBERS[raw]
+                explicit_counts.append(int(raw))
+            elif raw in CHINESE_NUMBERS:
+                explicit_counts.append(CHINESE_NUMBERS[raw])
+        if explicit_counts:
+            return max(1, max(explicit_counts))
         return max(1, (len(request.travelers) + 1) // 2)
