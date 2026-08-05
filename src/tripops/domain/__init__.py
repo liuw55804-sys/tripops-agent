@@ -3,6 +3,15 @@ from tripops.domain.constraints import Constraint, ConstraintKind, ConstraintPri
 from tripops.domain.disruptions import DisruptionEvent, DisruptionType
 from tripops.domain.evidence import Evidence, EvidenceSource
 from tripops.domain.plan import PlanStep, PlanStepStatus, TravelPlan
+from tripops.domain.quotes import (
+    BudgetComponent,
+    BudgetLedger,
+    FxRate,
+    QuoteFact,
+    QuoteKind,
+    QuoteStatus,
+    QuoteUnit,
+)
 from tripops.domain.trip import Traveler, TripRequest
 from tripops.domain.violations import Violation, ViolationCode, ViolationSeverity
 
@@ -10,6 +19,8 @@ __all__ = [
     "ApprovalDecision",
     "ApprovalRequest",
     "CandidateFact",
+    "BudgetComponent",
+    "BudgetLedger",
     "Constraint",
     "ConstraintKind",
     "ConstraintPriority",
@@ -19,6 +30,11 @@ __all__ = [
     "EvidenceSource",
     "PlanStep",
     "PlanStepStatus",
+    "FxRate",
+    "QuoteFact",
+    "QuoteKind",
+    "QuoteStatus",
+    "QuoteUnit",
     "TravelPlan",
     "Traveler",
     "TripRequest",

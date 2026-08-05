@@ -143,11 +143,14 @@ function renderMetrics(run) {
   const dayCount = new Set(itinerary.map((item) => item.starts_at.slice(0, 10))).size;
   const unknownCount = Number(run.plan?.metadata?.unknown_cost_item_count || 0);
   const unpricedCapabilities = run.plan?.metadata?.unpriced_capabilities || [];
-  const costValue = `${formatMoney(run.plan?.estimated_total_cost, run.plan?.currency)}${unknownCount || unpricedCapabilities.length ? " + 待核价" : ""}`;
+  const ledger = run.plan?.budget_ledger;
+  const costValue = ledger
+    ? `${formatMoney(ledger.total_low, ledger.currency)}–${formatMoney(ledger.total_high, ledger.currency)}${ledger.unpriced_kinds?.length ? " + 待核价" : ""}`
+    : `${formatMoney(run.plan?.estimated_total_cost, run.plan?.currency)}${unknownCount || unpricedCapabilities.length ? " + 待核价" : ""}`;
   const values = [
     [String(dayCount), "旅行天数"],
     [String(itinerary.length), "已安排体验"],
-    [costValue, unknownCount || unpricedCapabilities.length ? "已估支出（预算未闭合）" : "预计行程内支出"],
+    [costValue, ledger ? "网页报价预算区间" : unknownCount || unpricedCapabilities.length ? "已估支出（预算未闭合）" : "预计行程内支出"],
     [`${run.evidence?.length || 0}/${run.evidence?.length || 0}`, "建议引用证据"],
   ];
   const target = $("#metrics");
@@ -157,6 +160,40 @@ function renderMetrics(run) {
     metric.append(node("strong", "", value), node("span", "", label));
     target.append(metric);
   });
+}
+
+function renderBudgetLedger(plan) {
+  const target = $("#budget-ledger");
+  target.replaceChildren();
+  const ledger = plan?.budget_ledger;
+  if (!ledger) {
+    target.append(node("p", "ledger-empty", "本次运行没有形成结构化网页报价。"));
+    return;
+  }
+  const total = node("div", "ledger-total");
+  total.append(node("span", "", "可解释预算区间"), node("strong", "", `${formatMoney(ledger.total_low, ledger.currency)}–${formatMoney(ledger.total_high, ledger.currency)}`));
+  target.append(total);
+  (ledger.components || []).forEach((component) => {
+    const row = node("div", "ledger-component");
+    const copy = node("div");
+    copy.append(node("strong", "", component.label), node("small", "", component.note));
+    row.append(copy, node("b", "", `${formatMoney(component.amount_low, component.currency)}–${formatMoney(component.amount_high, component.currency)}`));
+    target.append(row);
+  });
+  const usableQuotes = (ledger.quotes || []).filter((quote) => quote.status !== "rejected").slice(0, 6);
+  if (usableQuotes.length) target.append(node("p", "ledger-caption", "网页报价来源 · 点击核对实时库存"));
+  usableQuotes.forEach((quote) => {
+    const link = node("a", "quote-link");
+    link.href = quote.source_uri;
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.append(
+      node("span", "", quote.title),
+      node("b", "", `${formatMoney(quote.amount_low, quote.currency)}${quote.amount_high !== quote.amount_low ? `–${formatMoney(quote.amount_high, quote.currency)}` : ""} ↗`),
+    );
+    target.append(link);
+  });
+  if (ledger.unpriced_kinds?.length) target.append(node("p", "ledger-warning", `仍待核价：${ledger.unpriced_kinds.join("、")}`));
 }
 
 function renderConstraints(run) {
@@ -243,6 +280,7 @@ function renderResults(run, changedIds = new Set(), preserved = null) {
   $("#preservation-note").textContent = preserved === null ? "确定性约束已验证" : `局部重规划 · 保留 ${preserved}%`;
   renderMetrics(run);
   renderItinerary(run.plan, changedIds);
+  renderBudgetLedger(run.plan);
   renderConstraints(run);
   renderEvidence(run);
   $("#run-badge").textContent = "已完成";

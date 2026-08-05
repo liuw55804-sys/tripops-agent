@@ -6,7 +6,7 @@
 
 ## 简历表述
 
-> 基于 Python、LangChain v1 与 LangGraph 构建 Supervisor/Planner/Researcher/Verifier 多智能体旅行运维系统；设计 Skills 渐进加载、MCP 动态工具治理与四层上下文，接入 Open-Meteo、Wikipedia 与可选 Tavily 真实研究工具，将带引用的 CandidateFact 在研究后构建为可排程候选；以确定性城市日期段、转场 slot 与预算可验证性规则防止跨城混排和零元假报价。实现 checkpoint 断点恢复、局部重规划以及 timeout/retry/cache/circuit-breaker/fallback 全链路降级；建立 80-case 离线评测与故障注入集，100 项测试覆盖率 89.35%。
+> 基于 Python、LangChain v1 与 LangGraph 构建 Supervisor/Planner/Researcher/Verifier 多智能体旅行运维系统；设计 Skills 渐进加载、MCP 动态工具治理与四层上下文，接入 Open-Meteo、Wikipedia、Tavily 与 Frankfurter，将网页证据抽取为带日期、币种、单位和来源的 QuoteFact，并按房晚、人数与餐次生成区间 Budget Ledger；以确定性城市日期段、转场 slot 与预算可验证性规则防止跨城混排和零元假报价。实现 checkpoint 断点恢复、局部重规划以及 timeout/retry/cache/circuit-breaker/fallback 全链路降级；建立 80-case 离线评测与故障注入集，102 项测试覆盖率 89.09%。
 
 ## 面试时应主动限定的结论
 

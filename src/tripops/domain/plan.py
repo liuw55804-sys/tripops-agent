@@ -5,6 +5,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
+from tripops.domain.quotes import BudgetLedger
+
 
 class PlanStepStatus(StrEnum):
     PENDING = "pending"
@@ -71,6 +73,7 @@ class TravelPlan(BaseModel):
     itinerary: tuple[ItineraryItem, ...] = ()
     estimated_total_cost: Decimal = Field(default=Decimal("0"), ge=0)
     currency: str = Field(default="CNY", min_length=3, max_length=3)
+    budget_ledger: BudgetLedger | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")

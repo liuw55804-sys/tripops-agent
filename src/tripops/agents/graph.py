@@ -28,7 +28,12 @@ from tripops.observability import (
     emit_trace,
     trace_span,
 )
-from tripops.planning import CandidateBuilder, ConstraintAwareScheduler, EvidenceCandidateBuilder
+from tripops.planning import (
+    CandidateBuilder,
+    ConstraintAwareScheduler,
+    EvidenceBudgetBuilder,
+    EvidenceCandidateBuilder,
+)
 from tripops.skills import SkillSelectionPolicy
 
 
@@ -115,12 +120,14 @@ def build_tripops_graph(
     skill_selector: SkillSelectionPolicy | None = None,
     candidate_builder: CandidateBuilder | None = None,
     scheduler: ConstraintAwareScheduler | None = None,
+    budget_builder: EvidenceBudgetBuilder | None = None,
 ) -> TripOpsGraph:
     render_final = finalizer or _default_finalizer
     analyzer = impact_analyzer or ImpactAnalyzer()
     traces = trace_sink or NullTraceSink()
     build_candidates = candidate_builder or EvidenceCandidateBuilder()
     schedule_candidates = scheduler or ConstraintAwareScheduler()
+    build_budget = budget_builder or EvidenceBudgetBuilder()
 
     async def supervisor_node(state: GraphState) -> dict[str, Any]:
         trace_attributes: dict[str, Any] = {}
@@ -261,6 +268,11 @@ def build_tripops_graph(
                 repair_scope=repair_scope,
                 candidates=built.candidates,
             )
+            budget_ledger = await build_budget.build(
+                state["request"],
+                tuple(state.get("evidence", [])),
+                itinerary,
+            )
         emit_trace(
             traces,
             run_id=state["run_id"],
@@ -278,23 +290,29 @@ def build_tripops_graph(
                 "fact_count": built.fact_count,
                 "fallback_count": built.fallback_count,
                 "unpriced_capabilities": list(built.unpriced_capabilities),
+                "quote_count": len(budget_ledger.quotes),
+                "budget_range": [
+                    str(budget_ledger.total_low),
+                    str(budget_ledger.total_high),
+                ],
             },
         )
         updated_plan = plan.model_copy(
             update={
                 "itinerary": itinerary,
                 "estimated_total_cost": explanation.total_cost,
+                "budget_ledger": budget_ledger,
                 "metadata": {
                     **plan.metadata,
                     "candidate_source_mode": built.source_mode,
                     "candidate_fact_count": built.fact_count,
                     "candidate_fallback_count": built.fallback_count,
                     "schedule_fairness": explanation.jain_fairness,
-                    "estimated_cost_item_count": len(
-                        explanation.estimated_cost_item_ids
-                    ),
+                    "estimated_cost_item_count": len(explanation.estimated_cost_item_ids),
                     "unknown_cost_item_count": len(explanation.unknown_cost_item_ids),
                     "unpriced_capabilities": built.unpriced_capabilities,
+                    "quote_count": len(budget_ledger.quotes),
+                    "budget_unpriced_kinds": budget_ledger.unpriced_kinds,
                 },
             }
         )
@@ -327,9 +345,7 @@ def build_tripops_graph(
                 ),
                 attributes={"message": violation.message},
             )
-        has_errors = any(
-            violation.severity is ViolationSeverity.ERROR for violation in violations
-        )
+        has_errors = any(violation.severity is ViolationSeverity.ERROR for violation in violations)
         return {
             "violations": list(violations),
             "verification_complete": not has_errors,

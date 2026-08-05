@@ -175,6 +175,7 @@ class GovernedToolResearcher:
                         "degraded": degraded,
                         "attempts": attempts,
                         "latency_ms": round(latency_ms, 3),
+                        **cls._entry_metadata(item),
                     },
                 )
             )
@@ -186,12 +187,22 @@ class GovernedToolResearcher:
                             **candidate,
                             "source_capability": task.step.capability,
                             "evidence_id": evidence_id,
-                            "source_uri": candidate.get("source_uri")
-                            or item.get("source_uri"),
+                            "source_uri": candidate.get("source_uri") or item.get("source_uri"),
                         }
                     )
                 )
         return evidence, candidates
+
+    @staticmethod
+    def _entry_metadata(item: dict[str, Any]) -> dict[str, str | int | float | bool | None]:
+        raw = item.get("metadata")
+        if not isinstance(raw, dict):
+            return {}
+        return {
+            str(key): value
+            for key, value in raw.items()
+            if isinstance(value, (str, int, float, bool)) or value is None
+        }
 
     @staticmethod
     def _evidence_id(step_id: str, index: int) -> str:

@@ -104,9 +104,7 @@ async def _weather_forecast(
             "summary": " ".join(str(payload["summary"]) for payload in payloads),
             "source_uri": OPEN_METEO_FORECAST_URL,
             "evidence": [
-                evidence
-                for payload in payloads
-                for evidence in payload.get("evidence", [])
+                evidence for payload in payloads for evidence in payload.get("evidence", [])
             ],
         }
     location = str(arguments["location"])
@@ -142,8 +140,7 @@ async def _weather_forecast(
             "start_date": start_date.isoformat(),
             "end_date": min(end_date, horizon).isoformat(),
             "daily": (
-                "weather_code,temperature_2m_max,temperature_2m_min,"
-                "precipitation_probability_max"
+                "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
             ),
             "timezone": "auto",
         },
@@ -244,13 +241,14 @@ async def _tavily_search(
     api_key: str,
 ) -> dict[str, Any]:
     capability = str(arguments.get("capability", "general_research"))
-    query = str(arguments.get("query", "travel research"))
+    query = _travel_search_query(arguments)
     response = await client.post(
         TAVILY_SEARCH_URL,
         headers={"Authorization": f"Bearer {api_key}"},
         json={
             "query": query,
-            "search_depth": "basic",
+            "search_depth": "advanced",
+            "chunks_per_source": 3,
             "max_results": 8,
             "include_answer": False,
             "include_raw_content": False,
@@ -269,6 +267,11 @@ async def _tavily_search(
             "source_name": "tavily-web-search",
             "source_uri": source_uri,
             "confidence": min(0.95, max(0.55, float(result.get("score", 0.7)))),
+            "metadata": {
+                "search_title": title,
+                "search_query": query,
+                "source_score": round(float(result.get("score", 0.7)), 4),
+            },
         }
         entries.append(entry)
     return {
@@ -276,6 +279,25 @@ async def _tavily_search(
         "source_uri": TAVILY_SEARCH_URL,
         "evidence": entries,
     }
+
+
+def _travel_search_query(arguments: dict[str, Any]) -> str:
+    capability = str(arguments.get("capability", "general_research"))
+    base = str(arguments.get("query", "travel research")).strip()
+    destinations = " ".join(str(item) for item in arguments.get("destinations", []))
+    dates = f"{arguments.get('start_date', '')} to {arguments.get('end_date', '')}"
+    travelers = str(arguments.get("traveler_count", 1))
+    requirement = str(arguments.get("requirement", "")).strip()
+    intent = {
+        "accommodation_search": "hotel price per room per night booking",
+        "transport_search": "flight train fare per person booking",
+        "restaurant_search": "restaurant menu average price per person reservation",
+    }.get(capability, "official current travel information")
+    return " ".join(
+        part
+        for part in (base, destinations, dates, f"{travelers} travelers", intent, requirement)
+        if part
+    )[:900]
 
 
 async def _geocode(client: httpx.AsyncClient, location: str) -> dict[str, Any]:

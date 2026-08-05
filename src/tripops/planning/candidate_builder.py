@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 from collections import Counter
 from decimal import Decimal
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from pydantic import BaseModel
 
-from tripops.agents.models import ResearchResult
 from tripops.domain.candidates import CandidateFact
 from tripops.domain.trip import TripRequest
 from tripops.planning.catalog import (
@@ -14,6 +15,9 @@ from tripops.planning.catalog import (
     DemoDestinationCatalog,
 )
 from tripops.planning.route import allocate_destination_days, route_transitions
+
+if TYPE_CHECKING:
+    from tripops.agents.models import ResearchResult
 
 
 class CandidateBuildResult(BaseModel):
@@ -116,9 +120,7 @@ class EvidenceCandidateBuilder:
     ) -> tuple[CandidateActivity, ...]:
         return tuple(
             candidate.model_copy(
-                update={
-                    "evidence_ids": (latest_by_capability[candidate.source_capability],)
-                }
+                update={"evidence_ids": (latest_by_capability[candidate.source_capability],)}
             )
             if candidate.source_capability in latest_by_capability
             else candidate
@@ -189,11 +191,7 @@ class EvidenceCandidateBuilder:
             for evidence in result.evidence
             if evidence.metadata.get("capability") in cost_capabilities
         }
-        priced = {
-            fact.source_capability
-            for fact in facts
-            if fact.estimated_cost is not None
-        }
+        priced = {fact.source_capability for fact in facts if fact.estimated_cost is not None}
         return tuple(sorted(researched - priced))
 
     @staticmethod
@@ -211,9 +209,7 @@ class EvidenceCandidateBuilder:
             duration_minutes=fact.duration_minutes or (75 if food else 120),
             cost=fact.estimated_cost or Decimal("0"),
             cost_status=(
-                CandidateCostStatus.ESTIMATED
-                if cost_known
-                else CandidateCostStatus.UNKNOWN
+                CandidateCostStatus.ESTIMATED if cost_known else CandidateCostStatus.UNKNOWN
             ),
             required_transit_minutes=fact.required_transit_minutes or 30,
             indoor=fact.indoor if fact.indoor is not None else food,

@@ -24,6 +24,8 @@ def test_web_app_and_static_assets_are_served() -> None:
     assert script.status_code == 200
     assert "simulateStorm" in script.text
     assert "budget_unverified" in script.text
+    assert "renderBudgetLedger" in script.text
+    assert 'id="budget-ledger"' in page.text
 
 
 def test_health() -> None:

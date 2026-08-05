@@ -171,6 +171,18 @@ main { overflow: hidden; }
 .itinerary-item p { margin: 4px 0 0; color: var(--muted); font-size: 9px; }
 .item-cost { white-space: nowrap; font: 500 9px DM Mono, monospace; }
 .item-cost.warning { color: var(--coral); }
+.ledger-total, .ledger-component, .quote-link { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.ledger-total { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.ledger-total span, .ledger-component small { color: var(--muted); }
+.ledger-total strong { color: var(--teal); font-size: 20px; }
+.ledger-component { padding: 13px 0; border-bottom: 1px solid var(--line); }
+.ledger-component div { display: grid; gap: 4px; }
+.ledger-component b { white-space: nowrap; font: 500 10px DM Mono, monospace; }
+.ledger-caption { margin: 18px 0 8px; color: var(--muted); font: 500 9px DM Mono, monospace; text-transform: uppercase; letter-spacing: .08em; }
+.quote-link { padding: 9px 0; color: var(--ink); text-decoration: none; border-bottom: 1px dashed var(--line); }
+.quote-link span { max-width: 68%; font-size: 11px; line-height: 1.4; }
+.quote-link b { color: var(--teal); white-space: nowrap; font: 500 9px DM Mono, monospace; }
+.ledger-warning, .ledger-empty { color: var(--coral); font-size: 11px; }
 .insight-column { display: grid; gap: 20px; }
 .constraints-card { background: var(--foam); }
 #constraint-health, #skills, .evidence-list { padding: 18px 22px; }

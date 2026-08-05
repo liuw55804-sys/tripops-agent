@@ -67,12 +67,13 @@ API 启动后：
 | [Open-Meteo](https://open-meteo.com/en/docs) | 地理编码、天气预报 | 无需 | 仅请求可用预报窗口；超出时显式返回“不可预报” |
 | [MediaWiki Action API](https://www.mediawiki.org/wiki/API%3ASearch/en) | 目的地附近 POI 与可引用页面 | 无需 | 提供地点候选，不代替票价/营业时间核验 |
 | [Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search) | 交通、政策、餐饮、住宿和当前网页搜索 | `TRIPOPS_TAVILY_API_KEY` | 只生成 Evidence；搜索结果页不会被伪装成已核价候选 |
+| [Frankfurter](https://frankfurter.dev/) | 网页报价的带日期外币换算 | 无需 | 使用央行参考汇率；换算值仍标记为估算 |
 
-Candidate Builder 会把带 citation 的 `CandidateFact` 规范化成可排程候选。多目的地先被分配为连续城市日期段，切换日固定为城际转场；候选不足时按“城市 × 时段”补位。价格未被可靠来源确认时显示“待核价”，Verifier 输出 `budget_unverified`，不会宣称预算已通过。
+Candidate Builder 会把带 citation 的 `CandidateFact` 规范化成可排程候选。多目的地先被分配为连续城市日期段，切换日固定为城际转场；候选不足时按“城市 × 时段”补位。独立 Quote Extractor 从网页 Evidence 中提取原币种、区间、单位、城市、日期和链接，拒绝年份/地点不匹配的报价，再由 Budget Ledger 按房间晚数、人数和餐次数量计算可解释区间。价格未被可靠来源确认时显示“待核价”，Verifier 输出 `budget_unverified`，不会宣称预算已通过。
 
 ## 可验证结果
 
-- 100 个自动化测试，语句/分支综合覆盖率 89.35%。
+- 102 个自动化测试，语句/分支综合覆盖率 89.09%。
 - 约 9.36k 行有效 Python（源码、测试与 MCP Mock），仓库首个提交共 12k+ 行。
 - 50 个标准约束、20 个动态变更、10 个故障注入案例。
 - 基线中 labelled violation F1、citation correctness/freshness、局部影响召回、原计划保留和 fallback 成功率均为 100%。

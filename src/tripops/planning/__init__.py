@@ -1,5 +1,11 @@
 """Deterministic candidate generation and constraint-aware itinerary scheduling."""
 
+from tripops.planning.budgeting import (
+    EvidenceBudgetBuilder,
+    FrankfurterFxRateProvider,
+    FxRateProvider,
+    WebQuoteExtractor,
+)
 from tripops.planning.candidate_builder import (
     CandidateBuilder,
     CandidateBuildResult,
@@ -26,6 +32,10 @@ __all__ = [
     "ConstraintAwareScheduler",
     "DemoDestinationCatalog",
     "EvidenceCandidateBuilder",
+    "EvidenceBudgetBuilder",
+    "FrankfurterFxRateProvider",
+    "FxRateProvider",
+    "WebQuoteExtractor",
     "DestinationDay",
     "RouteTransition",
     "allocate_destination_days",

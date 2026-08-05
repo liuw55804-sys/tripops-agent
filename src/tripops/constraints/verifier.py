@@ -54,11 +54,13 @@ class DeterministicConstraintVerifier:
         actual_total = sum((item.cost for item in plan.itinerary), start=Decimal("0"))
         violations = []
         unknown_item_ids = tuple(
-            item.id
-            for item in plan.itinerary
-            if item.metadata.get("cost_status") == "unknown"
+            item.id for item in plan.itinerary if item.metadata.get("cost_status") == "unknown"
         )
-        raw_unpriced = plan.metadata.get("unpriced_capabilities", ())
+        raw_unpriced = (
+            plan.budget_ledger.unpriced_kinds
+            if plan.budget_ledger is not None
+            else plan.metadata.get("unpriced_capabilities", ())
+        )
         unpriced_capabilities = (
             tuple(str(item) for item in raw_unpriced)
             if isinstance(raw_unpriced, (list, tuple, set))
@@ -76,12 +78,15 @@ class DeterministicConstraintVerifier:
                     capabilities=unpriced_capabilities,
                 )
             )
-        if actual_total > request.budget:
+        compared_total = (
+            plan.budget_ledger.total_low if plan.budget_ledger is not None else actual_total
+        )
+        if compared_total > request.budget:
             violations.append(
                 self._violation(
                     ViolationCode.BUDGET_EXCEEDED,
                     (
-                        f"itinerary cost {actual_total} exceeds budget "
+                        f"estimated trip cost {compared_total} exceeds budget "
                         f"{request.budget} {request.currency}"
                     ),
                     item_ids=tuple(item.id for item in plan.itinerary if item.cost > 0),
@@ -204,9 +209,7 @@ class DeterministicConstraintVerifier:
                 continue
             unknown = tuple(
                 sorted(
-                    evidence_id
-                    for evidence_id in item.evidence_ids
-                    if evidence_id not in evidence
+                    evidence_id for evidence_id in item.evidence_ids if evidence_id not in evidence
                 )
             )
             if unknown:
@@ -292,9 +295,8 @@ class DeterministicConstraintVerifier:
         excluded = set(self._as_string_list(constraint.value, key="excluded"))
         affected = []
         for item in plan.itinerary:
-            if (
-                constraint.traveler_ids
-                and not set(constraint.traveler_ids) & set(item.traveler_ids)
+            if constraint.traveler_ids and not set(constraint.traveler_ids) & set(
+                item.traveler_ids
             ):
                 continue
             risks = set(self._metadata_strings(item, "dietary_risks"))
@@ -320,9 +322,8 @@ class DeterministicConstraintVerifier:
         required = set(self._as_string_list(constraint.value, key="required"))
         affected = []
         for item in plan.itinerary:
-            if (
-                constraint.traveler_ids
-                and not set(constraint.traveler_ids) & set(item.traveler_ids)
+            if constraint.traveler_ids and not set(constraint.traveler_ids) & set(
+                item.traveler_ids
             ):
                 continue
             if "accessibility_features" not in item.metadata:
