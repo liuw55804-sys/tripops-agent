@@ -106,7 +106,8 @@ class WebQuoteExtractor:
                     id=f"quote-{sha1(quote_key.encode()).hexdigest()[:12]}",
                     kind=kind,
                     title=title,
-                    location=location,
+                        location=location,
+                        scope_key=str(item.metadata.get("search_scope") or "general"),
                     amount_low=min(amount_low, amount_high),
                     amount_high=max(amount_low, amount_high),
                     currency=currency,
@@ -258,28 +259,41 @@ class EvidenceBudgetBuilder:
                 city_quotes,
                 rate_map,
                 request.currency,
-                kind="accommodation",
+                kind=f"accommodation:{destination}",
                 label=f"{destination}住宿",
                 quantity=Decimal(rooms * nights),
                 note=f"{rooms} 间 × {nights} 晚；网页指示价",
             )
 
-        transport_quotes = tuple(
-            quote
-            for quote in usable
-            if quote.kind is QuoteKind.TRANSPORT and quote.currency in rate_map
-        )
-        self._append_quote_component(
-            components,
-            unpriced,
-            transport_quotes,
-            rate_map,
-            request.currency,
-            kind="transport",
-            label="城际交通",
-            quantity=Decimal(len(request.travelers)),
-            note=f"单人价格 × {len(request.travelers)} 人；路线与日期仍需下单页确认",
-        )
+        transport_scopes = [
+            ("international_outbound", f"{request.origin} → {request.destinations[0]} 国际交通"),
+            *(
+                (f"intercity_{index + 1}", f"{origin} → {destination} 城际交通")
+                for index, (origin, destination) in enumerate(
+                    zip(request.destinations, request.destinations[1:], strict=False)
+                )
+            ),
+            ("international_return", f"{request.destinations[-1]} → {request.origin} 国际交通"),
+        ]
+        for scope, label in transport_scopes:
+            transport_quotes = tuple(
+                quote
+                for quote in usable
+                if quote.kind is QuoteKind.TRANSPORT
+                and quote.scope_key == scope
+                and quote.currency in rate_map
+            )
+            self._append_quote_component(
+                components,
+                unpriced,
+                transport_quotes,
+                rate_map,
+                request.currency,
+                kind=f"transport:{scope}",
+                label=label,
+                quantity=Decimal(len(request.travelers)),
+                note=f"单人价格 × {len(request.travelers)} 人；日期与行李额需下单页确认",
+            )
 
         meal_count = sum(1 for item in itinerary if item.category in {"food", "meal", "restaurant"})
         restaurant_quotes = tuple(
@@ -293,7 +307,7 @@ class EvidenceBudgetBuilder:
             restaurant_quotes,
             rate_map,
             request.currency,
-            kind="restaurant",
+            kind="restaurant:all_meals",
             label="行程内餐饮",
             quantity=Decimal(max(1, meal_count) * len(request.travelers)),
             note=f"人均价格 × {len(request.travelers)} 人 × {meal_count} 餐",

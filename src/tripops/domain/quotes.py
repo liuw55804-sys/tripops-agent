@@ -28,6 +28,7 @@ class QuoteFact(BaseModel):
     kind: QuoteKind
     title: str = Field(min_length=1)
     location: str | None = None
+    scope_key: str = Field(default="general", min_length=1)
     amount_low: Decimal = Field(gt=0)
     amount_high: Decimal = Field(gt=0)
     currency: str = Field(min_length=3, max_length=3)

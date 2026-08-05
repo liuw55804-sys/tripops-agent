@@ -28,6 +28,7 @@ def evidence(
     title: str,
     claim: str,
     url: str,
+    scope: str = "general",
 ) -> Evidence:
     return Evidence(
         id=evidence_id,
@@ -37,7 +38,7 @@ def evidence(
         source_uri=url,
         retrieved_at=datetime(2026, 8, 5, tzinfo=UTC),
         confidence=0.9,
-        metadata={"capability": capability, "search_title": title},
+        metadata={"capability": capability, "search_title": title, "search_scope": scope},
     )
 
 
@@ -70,11 +71,28 @@ def quote_evidence() -> tuple[Evidence, ...]:
             "https://hotel.example/melbourne",
         ),
         evidence(
+            "flight-out",
+            "transport_search",
+            "Shanghai flight to Sydney",
+            "2026-09-30 fare from AUD $500 per person",
+            "https://air.example/outbound",
+            "international_outbound",
+        ),
+        evidence(
             "flight",
             "transport_search",
             "Sydney to Melbourne",
             "2026-10-03 fare from AUD $100 per person",
             "https://air.example/fare",
+            "intercity_1",
+        ),
+        evidence(
+            "flight-return",
+            "transport_search",
+            "Melbourne flight to Shanghai",
+            "2026-10-03 fare from AUD $400 per person",
+            "https://air.example/return",
+            "international_return",
         ),
         evidence(
             "meal",
@@ -130,13 +148,15 @@ async def test_budget_ledger_applies_rooms_nights_travelers_meals_and_fx() -> No
         (meal,),
     )
 
-    assert ledger.total_low == Decimal("8500")
-    assert ledger.total_high == Decimal("8500")
+    assert ledger.total_low == Decimal("26500")
+    assert ledger.total_high == Decimal("26500")
     assert ledger.unpriced_kinds == ()
     assert {component.label for component in ledger.components} == {
         "悉尼住宿",
         "墨尔本住宿",
-        "城际交通",
+        "上海 → 悉尼 国际交通",
+        "悉尼 → 墨尔本 城际交通",
+        "墨尔本 → 上海 国际交通",
         "行程内餐饮",
     }
     assert len(ledger.fx_rates) == 1

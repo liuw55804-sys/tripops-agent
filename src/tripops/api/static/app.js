@@ -145,12 +145,12 @@ function renderMetrics(run) {
   const unpricedCapabilities = run.plan?.metadata?.unpriced_capabilities || [];
   const ledger = run.plan?.budget_ledger;
   const costValue = ledger
-    ? `${formatMoney(ledger.total_low, ledger.currency)}–${formatMoney(ledger.total_high, ledger.currency)}${ledger.unpriced_kinds?.length ? " + 待核价" : ""}`
+    ? `${formatMoney(ledger.total_low, ledger.currency)}–${formatMoney(ledger.total_high, ledger.currency)}${ledger.unpriced_kinds?.length ? " + 未覆盖" : ""}`
     : `${formatMoney(run.plan?.estimated_total_cost, run.plan?.currency)}${unknownCount || unpricedCapabilities.length ? " + 待核价" : ""}`;
   const values = [
     [String(dayCount), "旅行天数"],
     [String(itinerary.length), "已安排体验"],
-    [costValue, ledger ? "网页报价预算区间" : unknownCount || unpricedCapabilities.length ? "已估支出（预算未闭合）" : "预计行程内支出"],
+    [costValue, ledger ? (ledger.unpriced_kinds?.length ? "已核价小计（非总预算）" : "完整网页报价预算区间") : unknownCount || unpricedCapabilities.length ? "已估支出（预算未闭合）" : "预计行程内支出"],
     [`${run.evidence?.length || 0}/${run.evidence?.length || 0}`, "建议引用证据"],
   ];
   const target = $("#metrics");
@@ -171,7 +171,7 @@ function renderBudgetLedger(plan) {
     return;
   }
   const total = node("div", "ledger-total");
-  total.append(node("span", "", "可解释预算区间"), node("strong", "", `${formatMoney(ledger.total_low, ledger.currency)}–${formatMoney(ledger.total_high, ledger.currency)}`));
+  total.append(node("span", "", ledger.unpriced_kinds?.length ? "已核价小计 · 非总预算" : "完整预算区间"), node("strong", "", `${formatMoney(ledger.total_low, ledger.currency)}–${formatMoney(ledger.total_high, ledger.currency)}`));
   target.append(total);
   (ledger.components || []).forEach((component) => {
     const row = node("div", "ledger-component");

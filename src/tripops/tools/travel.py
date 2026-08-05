@@ -244,7 +244,7 @@ async def _tavily_search(
     capability = str(arguments.get("capability", "general_research"))
     queries = _travel_search_queries(arguments)
 
-    async def search(query: str) -> tuple[str, list[dict[str, Any]]]:
+    async def search(scope: str, query: str) -> tuple[str, str, list[dict[str, Any]]]:
         response = await client.post(
             TAVILY_SEARCH_URL,
             headers={"Authorization": f"Bearer {api_key}"},
@@ -258,11 +258,13 @@ async def _tavily_search(
             },
         )
         response.raise_for_status()
-        return query, list(response.json().get("results", []))
+        return scope, query, list(response.json().get("results", []))
 
     entries = []
     seen_urls: set[str] = set()
-    for query, results in await asyncio.gather(*(search(query) for query in queries)):
+    for scope, query, results in await asyncio.gather(
+        *(search(scope, query) for scope, query in queries)
+    ):
         for result in results:
             title = str(result.get("title", "")).strip()
             source_uri = str(result.get("url", "")).strip()
@@ -278,6 +280,7 @@ async def _tavily_search(
                 "metadata": {
                     "search_title": title,
                     "search_query": query,
+                    "search_scope": scope,
                     "source_score": round(float(result.get("score", 0.7)), 4),
                 },
             }
@@ -289,30 +292,54 @@ async def _tavily_search(
     }
 
 
-def _travel_search_queries(arguments: dict[str, Any]) -> tuple[str, ...]:
+def _travel_search_queries(arguments: dict[str, Any]) -> tuple[tuple[str, str], ...]:
     capability = str(arguments.get("capability", "general_research"))
     base = str(arguments.get("query", "travel research")).strip()
     destinations = tuple(str(item) for item in arguments.get("destinations", []))
     dates = f"{arguments.get('start_date', '')} to {arguments.get('end_date', '')}"
     travelers = str(arguments.get("traveler_count", 1))
     requirement = str(arguments.get("requirement", "")).strip()
+    origin_location = str(arguments.get("origin", ""))
+    start_date = str(arguments.get("start_date", ""))
+    end_date = str(arguments.get("end_date", ""))
     intent = {
         "accommodation_search": "hotel price per room per night booking",
         "transport_search": "flight train fare per person booking",
         "restaurant_search": "restaurant menu average price per person reservation",
     }.get(capability, "official current travel information")
-    scopes = (
-        destinations or ("",)
-        if capability in {"accommodation_search", "restaurant_search"}
-        else (" ".join(destinations),)
-    )
+    if capability == "transport_search" and destinations:
+        scoped_targets = [
+            (
+                "international_outbound",
+                f"{origin_location} to {destinations[0]} one way {start_date}",
+            ),
+            *(
+                (f"intercity_{index + 1}", f"{origin} to {destination} one way")
+                for index, (origin, destination) in enumerate(
+                    zip(destinations, destinations[1:], strict=False)
+                )
+            ),
+            (
+                "international_return",
+                f"{destinations[-1]} to {origin_location} one way {end_date}",
+            ),
+        ]
+    elif capability in {"accommodation_search", "restaurant_search"}:
+        scoped_targets = [
+            (f"{capability}:{destination}", destination) for destination in destinations or ("",)
+        ]
+    else:
+        scoped_targets = [(capability, " ".join(destinations))]
     return tuple(
-        " ".join(
-            part
-            for part in (base, scope, dates, f"{travelers} travelers", intent, requirement)
-            if part
-        )[:900]
-        for scope in scopes
+        (
+            scope,
+            " ".join(
+                part
+                for part in (base, target, dates, f"{travelers} travelers", intent, requirement)
+                if part
+            )[:900],
+        )
+        for scope, target in scoped_targets
     )
 
 
