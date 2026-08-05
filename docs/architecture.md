@@ -12,10 +12,11 @@ flowchart TD
     PLAN --> R1[Transport Researcher]
     PLAN --> R2[Stay and POI Researcher]
     PLAN --> R3[Policy and Risk Researcher]
-    R1 --> EVIDENCE[Evidence Store]
-    R2 --> EVIDENCE
-    R3 --> EVIDENCE
-    EVIDENCE --> SOLVER[Constraint Optimizer]
+    R1 --> RESEARCH[Evidence + CandidateFact]
+    R2 --> RESEARCH
+    R3 --> RESEARCH
+    RESEARCH --> BUILD[Candidate Builder]
+    BUILD --> SOLVER[Constraint-aware Scheduler]
     SOLVER --> VERIFY[Deterministic Verifier]
     VERIFY -->|violations| IMPACT[Impact Analyzer]
     IMPACT --> PLAN
@@ -38,8 +39,10 @@ flowchart TD
 ## Agent 边界
 
 - Supervisor 不直接搜索，也不直接生成完整行程，只决定控制流。
-- Planner 不调用外部事实工具，只构造或修订任务 DAG；确定性 Scheduler 负责候选硬过滤、时间槽、预算和 Jain fairness。
-- Researcher 只能输出 `Evidence`，不能修改计划或宣布任务完成。
+- Planner 不调用外部事实工具，只构造或修订任务 DAG，不在 Research 之前生成 itinerary。
+- Researcher 只能输出 `Evidence` 和引用该 Evidence 的 `CandidateFact`，不能直接修改计划或宣布任务完成。
+- Candidate Builder 去重、规范化真实候选，并为缺失的“目的地 × 时段”显式补入 demo candidate。
+- 确定性 Scheduler 在研究后负责候选硬过滤、时间槽、预算和 Jain fairness。
 - Verifier 只消费结构化行程、约束和证据，输出 `Violation`。
 - 确定性校验优先；只有主观偏好和证据充分性允许模型辅助判断。
 

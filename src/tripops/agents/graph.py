@@ -28,6 +28,7 @@ from tripops.observability import (
     emit_trace,
     trace_span,
 )
+from tripops.planning import CandidateBuilder, ConstraintAwareScheduler, EvidenceCandidateBuilder
 from tripops.skills import SkillSelectionPolicy
 
 
@@ -37,6 +38,9 @@ class GraphState(TripOpsState, total=False):
     supervisor_reason: str
     clarification_question: str
     repair_scope: RepairScope
+    candidate_source_mode: str
+    candidate_fact_count: int
+    candidate_fallback_count: int
 
 
 class ResearchInput(TypedDict):
@@ -109,10 +113,14 @@ def build_tripops_graph(
     trace_sink: TraceSink | None = None,
     checkpointer: Any | None = None,
     skill_selector: SkillSelectionPolicy | None = None,
+    candidate_builder: CandidateBuilder | None = None,
+    scheduler: ConstraintAwareScheduler | None = None,
 ) -> TripOpsGraph:
     render_final = finalizer or _default_finalizer
     analyzer = impact_analyzer or ImpactAnalyzer()
     traces = trace_sink or NullTraceSink()
+    build_candidates = candidate_builder or EvidenceCandidateBuilder()
+    schedule_candidates = scheduler or ConstraintAwareScheduler()
 
     async def supervisor_node(state: GraphState) -> dict[str, Any]:
         trace_attributes: dict[str, Any] = {}
@@ -196,6 +204,7 @@ def build_tripops_graph(
             request=state["request"],
             step=state["research_task"],
             plan_revision=state["plan_revision"],
+            run_id=state["run_id"],
         )
         with trace_span(
             traces,
@@ -226,6 +235,69 @@ def build_tripops_graph(
         return {
             "research_results": [result],
             "evidence": list(result.evidence),
+        }
+
+    async def candidate_builder_node(state: GraphState) -> dict[str, Any]:
+        plan = state.get("plan")
+        if plan is None:
+            return {"phase": WorkflowPhase.FAILED, "error": "candidate build requires plan"}
+        results = tuple(state.get("research_results", []))
+        with trace_span(
+            traces,
+            run_id=state["run_id"],
+            kind=TraceKind.GRAPH_NODE,
+            name="candidate_builder",
+        ) as span_id:
+            built = build_candidates.build(
+                state["request"],
+                results,
+                revision=plan.revision,
+            )
+            repair_scope = state.get("repair_scope")
+            itinerary, explanation = schedule_candidates.schedule(
+                state["request"],
+                revision=plan.revision,
+                previous_items=plan.itinerary if plan.revision > 1 else (),
+                repair_scope=repair_scope,
+                candidates=built.candidates,
+            )
+        emit_trace(
+            traces,
+            run_id=state["run_id"],
+            parent_span_id=span_id,
+            kind=TraceKind.GRAPH_NODE,
+            name="candidate_build_summary",
+            status=(
+                TraceStatus.DEGRADED
+                if built.source_mode in {"fallback", "mixed"}
+                else TraceStatus.SUCCEEDED
+            ),
+            attributes={
+                "source_mode": built.source_mode,
+                "candidate_count": len(built.candidates),
+                "fact_count": built.fact_count,
+                "fallback_count": built.fallback_count,
+            },
+        )
+        updated_plan = plan.model_copy(
+            update={
+                "itinerary": itinerary,
+                "estimated_total_cost": explanation.total_cost,
+                "metadata": {
+                    **plan.metadata,
+                    "candidate_source_mode": built.source_mode,
+                    "candidate_fact_count": built.fact_count,
+                    "candidate_fallback_count": built.fallback_count,
+                    "schedule_fairness": explanation.jain_fairness,
+                },
+            }
+        )
+        return {
+            "plan": updated_plan,
+            "candidate_source_mode": built.source_mode,
+            "candidate_fact_count": built.fact_count,
+            "candidate_fallback_count": built.fallback_count,
+            "phase": WorkflowPhase.RESEARCH,
         }
 
     async def verifier_node(state: GraphState) -> dict[str, Any]:
@@ -377,6 +449,7 @@ def build_tripops_graph(
     builder.add_node("supervisor", supervisor_node)
     builder.add_node("planner", planner_node)
     builder.add_node("researcher", researcher_node, input_schema=ResearchInput)
+    builder.add_node("candidate_builder", candidate_builder_node)
     builder.add_node("verifier", verifier_node)
     builder.add_node("impact", impact_node)
     builder.add_node("finalizer", finalizer_node)
@@ -398,7 +471,8 @@ def build_tripops_graph(
     )
     builder.add_conditional_edges("planner", fan_out_research)
     builder.add_edge("impact", "planner")
-    builder.add_edge("researcher", "supervisor")
+    builder.add_edge("researcher", "candidate_builder")
+    builder.add_edge("candidate_builder", "supervisor")
     builder.add_edge("verifier", "supervisor")
     builder.add_edge("finalizer", END)
     builder.add_edge("approval", "supervisor")

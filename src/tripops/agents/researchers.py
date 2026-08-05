@@ -1,3 +1,4 @@
+from tripops.agents.contracts import ResearcherAgent
 from tripops.agents.models import ResearchResult, ResearchTask
 from tripops.rag.citations import CitationBundle
 from tripops.rag.hybrid import HybridRetriever
@@ -62,3 +63,30 @@ class HybridRAGResearcher:
             ]
         ).strip()
 
+
+class FallbackResearcher:
+    """Use a deterministic researcher only when a live researcher cannot return evidence."""
+
+    def __init__(
+        self,
+        primary: ResearcherAgent,
+        fallback: ResearcherAgent,
+        *,
+        name: str = "live_with_offline_fallback",
+    ) -> None:
+        self.name = name
+        self.capabilities = primary.capabilities
+        self.primary = primary
+        self.fallback = fallback
+
+    async def research(self, task: ResearchTask) -> ResearchResult:
+        primary_result = await self.primary.research(task)
+        if primary_result.success and primary_result.evidence:
+            return primary_result
+        fallback_result = await self.fallback.research(task)
+        return fallback_result.model_copy(
+            update={
+                "agent_name": self.name,
+                "error": primary_result.error,
+            }
+        )

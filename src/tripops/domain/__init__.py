@@ -1,3 +1,4 @@
+from tripops.domain.candidates import CandidateFact
 from tripops.domain.constraints import Constraint, ConstraintKind, ConstraintPriority
 from tripops.domain.disruptions import DisruptionEvent, DisruptionType
 from tripops.domain.evidence import Evidence, EvidenceSource
@@ -8,6 +9,7 @@ from tripops.domain.violations import Violation, ViolationCode, ViolationSeverit
 __all__ = [
     "ApprovalDecision",
     "ApprovalRequest",
+    "CandidateFact",
     "Constraint",
     "ConstraintKind",
     "ConstraintPriority",

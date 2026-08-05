@@ -16,6 +16,7 @@ from tripops.agents.router import ResearcherRouter
 from tripops.agents.rule_based import RuleBasedSupervisor
 from tripops.context import WorkflowPhase
 from tripops.domain import (
+    CandidateFact,
     Evidence,
     EvidenceSource,
     PlanStep,
@@ -85,6 +86,28 @@ class ConcurrentResearcher:
         )
 
 
+class CitedCandidateResearcher(ConcurrentResearcher):
+    async def research(self, task: ResearchTask) -> ResearchResult:
+        result = await super().research(task)
+        if task.step.capability != "weather":
+            return result
+        evidence_id = result.evidence[0].id
+        facts = tuple(
+            CandidateFact(
+                id=f"cited-{period}",
+                title=f"Cited {period}",
+                location="Kyoto",
+                category="restaurant" if period == "lunch" else "landmark",
+                tags=frozenset({"food" if period == "lunch" else "culture"}),
+                source_capability="weather",
+                evidence_id=evidence_id,
+                preferred_period=period,
+            )
+            for period in ("morning", "lunch", "afternoon")
+        )
+        return result.model_copy(update={"candidate_facts": facts})
+
+
 class PassVerifier:
     async def verify(self, _: GraphState) -> tuple[Violation, ...]:
         return ()
@@ -138,6 +161,32 @@ async def test_graph_corrects_invalid_llm_supervisor_transition() -> None:
     assert guard_events
     assert guard_events[0].attributes["proposed_phase"] == "intake"
     assert guard_events[0].attributes["selected_phase"] == "plan"
+
+
+@pytest.mark.asyncio
+async def test_graph_builds_and_schedules_cited_candidates_after_research() -> None:
+    traces = InMemoryTraceSink()
+    trip_graph = build_tripops_graph(
+        supervisor=RuleBasedSupervisor(),
+        planner=TwoStepPlanner(),
+        researcher_router=ResearcherRouter((CitedCandidateResearcher(),)),
+        verifier=PassVerifier(),
+        trace_sink=traces,
+    )
+
+    result = await trip_graph.run(initial_state(request()))
+
+    assert result["plan"].metadata["candidate_source_mode"] == "real"
+    assert len(result["plan"].itinerary) == 15
+    assert all(
+        item.evidence_ids == ("ev-r1-weather",)
+        for item in result["plan"].itinerary
+    )
+    summary = next(
+        event for event in traces.snapshot() if event.name == "candidate_build_summary"
+    )
+    assert summary.status is TraceStatus.SUCCEEDED
+    assert summary.attributes["fact_count"] == 3
 
 
 @pytest.mark.asyncio

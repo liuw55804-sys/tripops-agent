@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import cast
 
+import httpx
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import FileResponse
@@ -11,7 +12,8 @@ from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
 from tripops import __version__
-from tripops.agents import build_tripops_graph
+from tripops.agents import FallbackResearcher, GovernedToolResearcher, build_tripops_graph
+from tripops.agents.contracts import ResearcherAgent
 from tripops.agents.llm import StructuredPlanner, StructuredSupervisor
 from tripops.agents.router import ResearcherRouter
 from tripops.agents.rule_based import (
@@ -31,10 +33,19 @@ from tripops.api.schemas import (
 from tripops.api.service import RunConflict, RunNotFound, TripOpsRunService
 from tripops.config import get_settings
 from tripops.constraints import DeterministicConstraintVerifier
-from tripops.context import RunBudget, open_sqlite_checkpointer
+from tripops.context import (
+    FileArtifactStore,
+    RunBudget,
+    RunBudgetLimits,
+    RuntimeContext,
+    open_sqlite_checkpointer,
+)
+from tripops.middleware import CircuitBreaker, ToolExecutionEngine
 from tripops.models import build_chat_model
-from tripops.observability import InMemoryTraceSink
+from tripops.observability import InMemoryTraceSink, ToolTraceAdapter
 from tripops.skills import SkillRegistry, SkillSelectionPolicy
+from tripops.tools import ToolRegistry
+from tripops.tools.travel import install_live_travel_tools
 
 
 @asynccontextmanager
@@ -46,18 +57,64 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     skill_registry = SkillRegistry((Path("skills"),))
     skill_registry.discover()
     skill_selector = SkillSelectionPolicy(skill_registry)
-    researcher = StaticEvidenceResearcher(
+    offline_researcher = StaticEvidenceResearcher(
         "offline_researcher",
         frozenset(
             {
+                "accommodation_search",
+                "accessibility_search",
                 "general_research",
+                "poi_search",
+                "restaurant_search",
                 "transport_search",
                 "weather_search",
                 "policy_search",
             }
         ),
     )
-    async with open_sqlite_checkpointer(settings.checkpoint_db) as checkpointer:
+    async with (
+        httpx.AsyncClient(
+            timeout=settings.external_http_timeout_seconds,
+            headers={"User-Agent": settings.external_user_agent},
+        ) as external_client,
+        open_sqlite_checkpointer(settings.checkpoint_db) as checkpointer,
+    ):
+        researchers: list[ResearcherAgent] = [offline_researcher]
+        if settings.live_research_enabled:
+            tool_registry = ToolRegistry()
+            tool_engine = ToolExecutionEngine(
+                registry=tool_registry,
+                budget=RunBudget(
+                    RunBudgetLimits(tool_calls=settings.max_tool_calls)
+                ),
+                circuit_breaker=CircuitBreaker(tool_registry),
+                artifact_store=FileArtifactStore(settings.artifact_dir),
+                event_sink=ToolTraceAdapter(trace_sink),
+                budget_factory=lambda: RunBudget(
+                    RunBudgetLimits(tool_calls=settings.max_tool_calls)
+                ),
+            )
+            live_capabilities = install_live_travel_tools(
+                tool_registry,
+                tool_engine,
+                external_client,
+                tavily_api_key=settings.tavily_api_key,
+            )
+            live_researcher = GovernedToolResearcher(
+                name="live_researcher",
+                capabilities=live_capabilities,
+                registry=tool_registry,
+                engine=tool_engine,
+                runtime=RuntimeContext(
+                    run_id="bootstrap",
+                    thread_id="bootstrap",
+                    user_id="tripops-api",
+                    model_name=settings.model_name,
+                ),
+            )
+            researchers.append(
+                FallbackResearcher(live_researcher, offline_researcher)
+            )
         supervisor: RuleBasedSupervisor | StructuredSupervisor
         planner: RuleBasedPlanner | StructuredPlanner
         if settings.agent_mode == "llm":
@@ -71,7 +128,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         graph = build_tripops_graph(
             supervisor=supervisor,
             planner=planner,
-            researcher_router=ResearcherRouter((researcher,)),
+            researcher_router=ResearcherRouter(tuple(researchers)),
             verifier=DeterministicConstraintVerifier(),
             trace_sink=trace_sink,
             checkpointer=checkpointer,

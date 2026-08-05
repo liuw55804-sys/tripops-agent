@@ -1,8 +1,11 @@
+import os
 import time
 
 from fastapi.testclient import TestClient
 
-from tripops.api.main import app
+os.environ.setdefault("TRIPOPS_LIVE_RESEARCH_ENABLED", "false")
+
+from tripops.api.main import app  # noqa: E402 - environment must be set before app import
 
 
 def test_web_app_and_static_assets_are_served() -> None:

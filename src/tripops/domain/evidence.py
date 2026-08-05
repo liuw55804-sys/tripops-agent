@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from enum import StrEnum
 
-from pydantic import AnyHttpUrl, BaseModel, Field
+from pydantic import AnyHttpUrl, BaseModel, Field, field_serializer
 
 
 class EvidenceSource(StrEnum):
@@ -27,7 +27,10 @@ class Evidence(BaseModel):
     artifact_id: str | None = None
     metadata: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
 
+    @field_serializer("source_uri")
+    def serialize_source_uri(self, value: AnyHttpUrl | None) -> str | None:
+        return str(value) if value is not None else None
+
     def is_stale(self, *, now: datetime | None = None) -> bool:
         current = now or datetime.now(UTC)
         return self.expires_at is not None and self.expires_at <= current
-

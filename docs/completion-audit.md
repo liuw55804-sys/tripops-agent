@@ -5,10 +5,10 @@
 | 要求 | 实现证据 | 验证证据 |
 | --- | --- | --- |
 | Python、LangChain v1、LangGraph | `pyproject.toml`；`agents/graph.py`；`agents/llm.py` | strict mypy；Agent graph 与 structured-output tests |
-| Supervisor / Planner / Researcher / Verifier | Agent Protocol、显式节点、并行 `Send`、结构化边界 | `test_agent_graph.py` 并行、重规划、trace tests |
+| Supervisor / Planner / Researcher / Candidate Builder / Verifier | Agent Protocol、显式节点、并行 `Send`、研究后排程 | Agent graph、candidate builder、重规划与 trace tests |
 | 多人多约束实际行程 | `planning/catalog.py`、`scoring.py`、`scheduler.py` | 6 项 scheduler tests；API 首次生成 15 items |
 | Skills 渐进加载 | frontmatter-only discovery、`SkillSelectionPolicy`、按命中 body loader | 4 项 selector tests；API 返回 selected skills |
-| MCP 与动态工具治理 | 三套 stdio MCP server、发现隔离、Tool Registry、GovernedToolResearcher | MCP smoke；registry、tool researcher tests |
+| MCP 与动态工具治理 | 三套 stdio MCP server、Open-Meteo/Wikipedia/Tavily adapter、Tool Registry、GovernedToolResearcher | MCP smoke；registry、travel tool、tool researcher tests |
 | Hooks / Middleware | Skills、tool selection、model budget、governed execution middleware | `test_langchain_hooks.py`、`test_tool_execution.py` |
 | 分层上下文 | Runtime、Graph State、SQLite Memory、Artifact Store、ContextCompiler | context/memory/artifact/compiler tests |
 | 持久化 checkpoint | `AsyncSqliteSaver`、interrupt/Command resume | 关闭并重开 SQLite 后恢复审批的 integration test |
@@ -20,7 +20,7 @@
 | 全链路追踪 | run/agent/step/tool/citation/violation/approval/degradation schema、JSONL/SSE | trace tests与 API trace/SSE test |
 | 离线评测 | 50 standard + 20 dynamic + 10 fault，JSON/Markdown report | `uv run tripops-eval`，labelled F1 等基线指标 |
 | 可运行演示 | FastAPI async run、status、SSE、trace、disruption、approval；offline/llm modes | TestClient E2E 与真实 Uvicorn `/health` smoke |
-| 质量门禁 | Ruff、strict mypy、pytest-cov、GitHub Actions | 86 tests；89.94% coverage；CI workflow |
+| 质量门禁 | Ruff、strict mypy、pytest-cov、GitHub Actions | 96 tests；88.80% coverage；CI workflow |
 | 代码规模 | 源码、测试与 MCP mock 约 9.36k 行；首提交 12k+ 总行 | `find ... -name '*.py' ... wc -l` |
 
 ## 指标边界

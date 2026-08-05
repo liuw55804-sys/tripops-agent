@@ -181,6 +181,7 @@ main { overflow: hidden; }
 .evidence-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 .evidence-row p { margin: 0; font-size: 10px; line-height: 1.55; }
 .evidence-row small { color: var(--muted); font: 8px DM Mono, monospace; }
+.evidence-source { color: var(--sea); text-underline-offset: 2px; }
 .storm-card { padding: 26px; color: white; background: var(--ink); position: relative; overflow: hidden; }
 .storm-card::after { content: ""; position: absolute; width: 180px; height: 180px; right: -80px; top: -110px; border: 16px solid rgba(255,255,255,.06); border-radius: 50%; }
 .storm-card .eyebrow { color: var(--sun); }

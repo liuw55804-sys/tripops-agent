@@ -29,6 +29,7 @@ class CandidateActivity(BaseModel):
         {"wheelchair", "step_free", "elevator"}
     )
     source_capability: str = "poi_search"
+    evidence_ids: tuple[str, ...] = ()
 
 
 class DemoDestinationCatalog:

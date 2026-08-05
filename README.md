@@ -35,6 +35,7 @@ TripOps 是一个面向多人、多约束旅行规划和行程中断恢复的 Ag
 - `M6` 已完成：80 个 TravelPlanner 风格案例、故障注入和可复现效果报告。
 - `M7` 已完成：异步 Run API、SSE trace、disruption 注入、审批恢复和交付文档。
 - `M8` 已完成：南半球假日风格交互台、实时 Agent 状态、行程/证据可视化和一键中断演练。
+- `M9` 已完成：真实 Researcher 工具、结构化 Candidate Builder 与 `Planner → Research → Candidate Build → Schedule → Verify` 调度链路。
 
 当前所有工具调用均可统一经过权限、风险、审批、预算、缓存、超时、重试、熔断、fallback、Artifact 外置与事件追踪。范围和验收指标见 [docs/scope.md](docs/scope.md)，总体架构见 [docs/architecture.md](docs/architecture.md)，API 使用见 [docs/api.md](docs/api.md)。
 
@@ -57,9 +58,21 @@ API 启动后：
 
 离线模式不需要模型 API Key，也不需要前端构建步骤；HTML、CSS 和原生 JavaScript 由 FastAPI 直接提供。生产接入参数见 `.env.example`。
 
+### 真实研究数据源
+
+`TRIPOPS_LIVE_RESEARCH_ENABLED=true` 时，Researcher 会通过受治理的 Tool Registry 调用：
+
+| 数据源 | 用途 | 密钥 | 边界 |
+| --- | --- | --- | --- |
+| [Open-Meteo](https://open-meteo.com/en/docs) | 地理编码、天气预报 | 无需 | 仅请求可用预报窗口；超出时显式返回“不可预报” |
+| [MediaWiki Action API](https://www.mediawiki.org/wiki/API%3ASearch/en) | 目的地附近 POI 与可引用页面 | 无需 | 提供地点候选，不代替票价/营业时间核验 |
+| [Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search) | 交通、政策、餐饮、住宿和当前网页搜索 | `TRIPOPS_TAVILY_API_KEY` | 可选；未配置时对应 capability 显式降级 |
+
+Candidate Builder 会把带 citation 的 `CandidateFact` 规范化成可排程候选。候选不足时仅补齐缺失时段，并在 plan metadata、trace 和页面标记 `real / mixed / fallback`，不将演示目录伪装为实时搜索结果。
+
 ## 可验证结果
 
-- 89 个自动化测试，语句/分支综合覆盖率 89.98%。
+- 96 个自动化测试，语句/分支综合覆盖率 88.80%。
 - 约 9.36k 行有效 Python（源码、测试与 MCP Mock），仓库首个提交共 12k+ 行。
 - 50 个标准约束、20 个动态变更、10 个故障注入案例。
 - 基线中 labelled violation F1、citation correctness/freshness、局部影响召回、原计划保留和 fallback 成功率均为 100%。
@@ -82,4 +95,4 @@ src/tripops/
 └── tools/           # Tool Registry 与 MCP discovery
 ```
 
-默认 `TRIPOPS_AGENT_MODE=offline`，用于无密钥复现。切换为 `llm` 后，Supervisor 与 Planner 使用 LangChain structured output；LLM 只提出路由和研究 DAG，最终 itinerary 仍由确定性调度器构造并由 Verifier 裁决。
+默认 `TRIPOPS_AGENT_MODE=offline`，用于无模型密钥复现；真实 Researcher 与 Agent 模式独立开关。切换为 `llm` 后，Supervisor 与 Planner 使用 LangChain structured output；LLM 只提出路由和研究 DAG，研究完成后才由 Candidate Builder 和确定性 Scheduler 构造 itinerary，最后由 Verifier 裁决。

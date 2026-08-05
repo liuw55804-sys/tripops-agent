@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     model_api_key: str = Field(default="", repr=False)
     model_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
+    live_research_enabled: bool = True
+    tavily_api_key: str = Field(default="", repr=False)
+    external_http_timeout_seconds: float = Field(default=15, gt=0, le=60)
+    external_user_agent: str = "TripOpsAgent/0.1 (+https://github.com/liuw55804-sys/tripops-agent)"
+
     checkpoint_db: Path = Path(".tripops/checkpoints.sqlite")
     artifact_dir: Path = Path(".tripops/artifacts")
 

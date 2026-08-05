@@ -73,6 +73,7 @@ def task(capability: str = "weather_search") -> ResearchTask:
         request=request(),
         step=PlanStep(id="r1-weather", title="Kyoto weather", capability=capability),
         plan_revision=1,
+        run_id="active-run",
     )
 
 
@@ -96,11 +97,49 @@ async def test_researcher_selects_governed_tool_and_returns_fresh_evidence(
     assert result.evidence[0].claim == "Rain after 16:00"
     assert result.evidence[0].source_name == "weather.primary"
     assert result.evidence[0].expires_at is not None
-    assert captured == {
-        "location": "Kyoto",
-        "start_date": "2030-10-01",
-        "end_date": "2030-10-03",
-    }
+    assert captured["location"] == "Kyoto"
+    assert captured["start_date"] == "2030-10-01"
+    assert captured["end_date"] == "2030-10-03"
+    assert captured["capability"] == "weather_search"
+    assert captured["destinations"] == ["Kyoto"]
+
+
+@pytest.mark.asyncio
+async def test_researcher_parses_cited_candidate_facts_and_uses_active_run_id(
+    tmp_path: Path,
+) -> None:
+    researcher, engine = build_researcher(tmp_path, (descriptor("weather.primary"),))
+
+    async def handler(_: dict[str, Any]) -> dict[str, object]:
+        return {
+            "evidence": [
+                {
+                    "claim": "Kyoto Botanical Garden has documented public access.",
+                    "source_name": "provider",
+                    "source_uri": "https://example.com/garden",
+                    "confidence": 0.87,
+                    "candidate": {
+                        "id": "garden",
+                        "title": "Kyoto Botanical Garden",
+                        "location": "Kyoto",
+                        "category": "park",
+                        "tags": ["park", "nature"],
+                        "preferred_period": "morning",
+                    },
+                }
+            ]
+        }
+
+    engine.register_handler("weather.primary", handler)
+
+    result = await researcher.research(task())
+    events = engine.event_sink.snapshot()
+
+    assert result.evidence[0].source_uri is not None
+    assert result.evidence[0].source_name == "provider"
+    assert result.candidate_facts[0].evidence_id == result.evidence[0].id
+    assert result.candidate_facts[0].source_capability == "weather_search"
+    assert {event.run_id for event in events} == {"active-run"}
 
 
 @pytest.mark.asyncio

@@ -157,6 +157,12 @@ function renderMetrics(run) {
 function renderConstraints(run) {
   const target = $("#constraint-health");
   target.replaceChildren();
+  const candidateMode = run.plan?.metadata?.candidate_source_mode || "fallback";
+  const candidateStatus = {
+    real: ["真实候选来源", false, "✓ 实时"],
+    mixed: ["真实候选来源", true, "部分补位"],
+    fallback: ["真实候选来源", true, "演示降级"],
+  }[candidateMode] || ["真实候选来源", true, candidateMode];
   const rows = [
     ["预算上限", run.violations?.some((v) => v.code === "budget_exceeded")],
     ["日程无冲突", run.violations?.some((v) => ["time_overlap", "date_out_of_range"].includes(v.code))],
@@ -169,6 +175,12 @@ function renderConstraints(run) {
     row.append(node("span", "", label), status);
     target.append(row);
   });
+  const sourceRow = node("div", "health-row");
+  sourceRow.append(
+    node("span", "", candidateStatus[0]),
+    node("b", candidateStatus[1] ? "warning" : "", candidateStatus[2]),
+  );
+  target.append(sourceRow);
   (run.violations || []).slice(0, 2).forEach((violation) => {
     const row = node("div", "health-row");
     row.append(node("span", "", violation.message), node("b", "warning", violation.severity));
@@ -179,13 +191,25 @@ function renderConstraints(run) {
 function renderEvidence(run) {
   const skills = $("#skills");
   skills.replaceChildren();
+  const sourceLabels = { real: "候选: 真实来源", mixed: "候选: 真实 + 补位", fallback: "候选: 演示降级" };
+  const sourceMode = run.plan?.metadata?.candidate_source_mode;
+  if (sourceMode) skills.append(node("span", "skill-chip", sourceLabels[sourceMode] || `候选: ${sourceMode}`));
   (run.selected_skills || []).forEach((skill) => skills.append(node("span", "skill-chip", skill)));
   if (!run.selected_skills?.length) skills.append(node("span", "skill-chip", "deterministic-planning"));
   const target = $("#evidence");
   target.replaceChildren();
   (run.evidence || []).slice(0, 4).forEach((evidence) => {
     const row = node("div", "evidence-row");
-    row.append(node("p", "", evidence.claim), node("small", "", `${evidence.source_name} · confidence ${Math.round(evidence.confidence * 100)}%`));
+    row.append(node("p", "", evidence.claim));
+    const source = evidence.source_uri ? node("a", "evidence-source", evidence.source_name) : node("span", "", evidence.source_name);
+    if (evidence.source_uri) {
+      source.href = evidence.source_uri;
+      source.target = "_blank";
+      source.rel = "noreferrer";
+    }
+    const meta = node("small");
+    meta.append(source, document.createTextNode(` · confidence ${Math.round(evidence.confidence * 100)}%`));
+    row.append(meta);
     target.append(row);
   });
 }

@@ -6,13 +6,13 @@
 
 ## 简历表述
 
-> 基于 Python、LangChain v1 与 LangGraph 构建 Supervisor/Planner/Researcher/Verifier 多智能体旅行运维系统；设计 Skills 渐进加载、MCP 动态工具治理与四层上下文，使用 BM25 + Dense + RRF + 语义重排生成可追溯证据，并以确定性规则校验预算、时间窗、通勤、饮食及无障碍硬约束。实现 checkpoint 断点恢复、人工审批、影响范围分析与局部重规划，以及 timeout/retry/cache/circuit-breaker/fallback 全链路降级；建立 80-case 离线评测与故障注入集，86 项测试覆盖率 89.94%。
+> 基于 Python、LangChain v1 与 LangGraph 构建 Supervisor/Planner/Researcher/Verifier 多智能体旅行运维系统；设计 Skills 渐进加载、MCP 动态工具治理与四层上下文，接入 Open-Meteo、Wikipedia 与可选 Tavily 真实研究工具，将带引用的 CandidateFact 在研究后构建为可排程候选；以确定性规则校验预算、时间窗、通勤、饮食及无障碍硬约束。实现 checkpoint 断点恢复、局部重规划以及 timeout/retry/cache/circuit-breaker/fallback 全链路降级；建立 80-case 离线评测与故障注入集，96 项测试覆盖率 88.80%。
 
 ## 面试时应主动限定的结论
 
 - 100% 指标来自带标签的确定性离线 fixture，用于验证规则、引用和降级链路，不代表开放世界路线推荐质量。
 - Dense Retriever 默认使用可离线复现的 hash embedding；安装 `rag` extra 后可替换为 Milvus 与 CrossEncoder，融合接口不变。
-- Mock MCP 用来稳定复现 discovery、隔离失败和工具路由；真实供应商仍需补充鉴权、配额和服务条款治理。
+- Mock MCP 用来稳定复现 discovery、隔离失败和工具路由；Open-Meteo/Wikipedia 为真实只读数据源，Tavily 需单独配置密钥，仍需在生产环境补充配额和服务条款治理。
 - 当前不执行支付和出票。所有高影响或财务动作只生成 ApprovalRequest，并由 checkpoint 暂停。
 
 ## 可深入追问的设计点

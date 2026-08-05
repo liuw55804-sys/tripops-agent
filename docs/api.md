@@ -7,6 +7,8 @@ uv sync --extra dev
 uv run tripops-api
 ```
 
+默认启用无密钥的 Open-Meteo 和 Wikipedia 真实研究工具。如需交通、政策、餐饮和住宿网页搜索，在 `.env` 配置 `TRIPOPS_TAVILY_API_KEY`。不需外网的确定性实验可设置 `TRIPOPS_LIVE_RESEARCH_ENABLED=false`。
+
 交互演示台位于 `http://127.0.0.1:9900/`，可完成创建行程、查看 Agent 实时进度、浏览结构化结果，以及注入夏季风暴并观察局部重规划。页面直接调用下述 API，无需 Node.js 或前端构建步骤。
 
 Swagger UI 位于 `http://127.0.0.1:9900/docs`。

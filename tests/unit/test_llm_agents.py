@@ -79,7 +79,7 @@ async def test_structured_supervisor_uses_schema_and_budget() -> None:
 
 
 @pytest.mark.asyncio
-async def test_structured_planner_augments_required_research_and_schedules() -> None:
+async def test_structured_planner_augments_required_research_without_scheduling() -> None:
     draft = PlannerDraft(
         tasks=(
             ResearchTaskDraft(
@@ -112,8 +112,9 @@ async def test_structured_planner_augments_required_research_and_schedules() -> 
         "restaurant_search",
     }
     assert len(plan.steps) == 5
-    assert len(plan.itinerary) == 6
-    assert all(item.metadata["planner_focus"] == ("culture",) for item in plan.itinerary)
+    assert plan.itinerary == ()
+    assert plan.metadata["planner_focus"] == ("culture",)
+    assert plan.metadata["planner_assumptions"] == ("offline candidate catalog",)
     assert budget.snapshot()["model_calls"] == 1
     assert budget.snapshot()["cost_units"] == 2
 

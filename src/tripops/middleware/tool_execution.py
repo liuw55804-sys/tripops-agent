@@ -17,6 +17,7 @@ from tripops.tools.registry import ToolRegistry
 
 ToolHandler = Callable[[dict[str, Any]], Awaitable[Any]]
 Sleeper = Callable[[float], Awaitable[None]]
+BudgetFactory = Callable[[], RunBudget]
 
 
 class ToolExecutionError(RuntimeError):
@@ -81,6 +82,7 @@ class ToolExecutionEngine:
         circuit_breaker: CircuitBreaker,
         artifact_store: FileArtifactStore,
         event_sink: EventSink,
+        budget_factory: BudgetFactory | None = None,
         policy: ToolExecutionPolicy | None = None,
         sleeper: Sleeper = asyncio.sleep,
         clock: Callable[[], float] = time.monotonic,
@@ -90,6 +92,8 @@ class ToolExecutionEngine:
         self.circuit_breaker = circuit_breaker
         self.artifact_store = artifact_store
         self.event_sink = event_sink
+        self.budget_factory = budget_factory
+        self._run_budgets: dict[str, RunBudget] = {}
         self.policy = policy or ToolExecutionPolicy()
         self.sleeper = sleeper
         self.clock = clock
@@ -174,7 +178,9 @@ class ToolExecutionEngine:
 
         for attempt in range(1, self.policy.max_attempts + 1):
             started_at = self.clock()
-            self.budget.consume_tool_call(cost_units=descriptor.estimated_cost_units)
+            self._budget_for(invocation).consume_tool_call(
+                cost_units=descriptor.estimated_cost_units
+            )
             self._emit(ToolEventType.STARTED, invocation, descriptor.name, attempt=attempt)
             try:
                 async with asyncio.timeout(descriptor.timeout_seconds):
@@ -225,6 +231,15 @@ class ToolExecutionEngine:
                 await self.sleeper(delay)
 
         raise AssertionError("unreachable")
+
+    def _budget_for(self, invocation: ToolInvocation) -> RunBudget:
+        if self.budget_factory is None:
+            return self.budget
+        budget = self._run_budgets.get(invocation.runtime.run_id)
+        if budget is None:
+            budget = self.budget_factory()
+            self._run_budgets[invocation.runtime.run_id] = budget
+        return budget
 
     def _authorize(self, descriptor: ToolDescriptor, invocation: ToolInvocation) -> None:
         if not descriptor.enabled:

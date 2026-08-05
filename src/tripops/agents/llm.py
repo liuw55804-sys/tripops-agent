@@ -7,7 +7,6 @@ from pydantic import BaseModel, Field, model_validator
 
 from tripops.agents.models import SupervisorDecision
 from tripops.agents.prompts import planner_messages, supervisor_messages
-from tripops.constraints import RepairScope
 from tripops.context import RunBudget
 from tripops.context.state import TripOpsState
 from tripops.domain.plan import PlanStep, TravelPlan
@@ -86,7 +85,7 @@ class StructuredPlanner:
     ) -> None:
         self.model = model
         self.budget = budget
-        self.scheduler = scheduler or ConstraintAwareScheduler()
+        del scheduler
         self.skill_loader = SkillInstructionLoader(skill_registry) if skill_registry else None
         self.runnable = cast(
             Runnable[Any, PlannerDraft],
@@ -107,13 +106,6 @@ class StructuredPlanner:
         request = state["request"]
         previous = state.get("plan")
         revision = 1 if previous is None else previous.revision + 1
-        repair_scope = self._repair_scope(state)
-        itinerary, explanation = self.scheduler.schedule(
-            request,
-            revision=revision,
-            previous_items=previous.itinerary if previous else (),
-            repair_scope=repair_scope,
-        )
         id_by_draft_id = {task.id: self._step_suffix(task.capability) for task in tasks}
         steps = tuple(
             PlanStep(
@@ -129,36 +121,20 @@ class StructuredPlanner:
             )
             for task in tasks
         )
-        total = sum((item.cost for item in itinerary), start=Decimal("0"))
         return TravelPlan(
             trip_id=request.id,
             revision=revision,
             steps=steps,
-            itinerary=itinerary,
-            estimated_total_cost=total,
+            itinerary=previous.itinerary if previous else (),
+            estimated_total_cost=(
+                previous.estimated_total_cost if previous else Decimal("0")
+            ),
             currency=request.currency,
-        ).model_copy(
-            update={
-                "itinerary": tuple(
-                    item.model_copy(
-                        update={
-                            "metadata": {
-                                **item.metadata,
-                                "planner_focus": draft.planning_focus,
-                                "planner_assumptions": draft.assumptions,
-                                "schedule_fairness": explanation.jain_fairness,
-                            }
-                        }
-                    )
-                    for item in itinerary
-                )
-            }
+            metadata={
+                "planner_focus": draft.planning_focus,
+                "planner_assumptions": draft.assumptions,
+            },
         )
-
-    @staticmethod
-    def _repair_scope(state: TripOpsState) -> RepairScope | None:
-        raw = cast(dict[str, object], state).get("repair_scope")
-        return raw if isinstance(raw, RepairScope) else None
 
     @staticmethod
     def _ensure_required_tasks(

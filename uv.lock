@@ -2609,6 +2609,7 @@ name = "tripops-agent"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "aiosqlite" },
     { name = "fastapi" },
     { name = "httpx" },
     { name = "langchain" },
@@ -2647,6 +2648,7 @@ rag = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiosqlite", specifier = ">=0.20,<1.0" },
     { name = "coverage", extras = ["toml"], marker = "extra == 'dev'", specifier = ">=7.10,<8.0" },
     { name = "fastapi", specifier = ">=0.116,<1.0" },
     { name = "fastmcp", marker = "extra == 'mcp'", specifier = ">=2.12,<3.0" },

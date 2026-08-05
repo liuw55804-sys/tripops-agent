@@ -71,6 +71,7 @@ class TravelPlan(BaseModel):
     itinerary: tuple[ItineraryItem, ...] = ()
     estimated_total_cost: Decimal = Field(default=Decimal("0"), ge=0)
     currency: str = Field(default="CNY", min_length=3, max_length=3)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_dag_references(self) -> "TravelPlan":

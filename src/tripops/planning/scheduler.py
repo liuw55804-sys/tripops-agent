@@ -48,11 +48,12 @@ class ConstraintAwareScheduler:
         revision: int,
         previous_items: tuple[ItineraryItem, ...] = (),
         repair_scope: RepairScope | None = None,
+        candidates: tuple[CandidateActivity, ...] | None = None,
     ) -> tuple[tuple[ItineraryItem, ...], ScheduleExplanation]:
-        candidates = self.catalog.candidates(request)
+        available = candidates if candidates is not None else self.catalog.candidates(request)
         excluded_tags = self._excluded_tags(request)
         required_counts = self._required_counts(request)
-        eligible, rejected = self._hard_filter(candidates, excluded_tags)
+        eligible, rejected = self._hard_filter(available, excluded_tags)
         if not eligible:
             raise ValueError("no candidate survives hard-constraint filtering")
 
@@ -81,7 +82,11 @@ class ConstraintAwareScheduler:
                     )
                     for candidate in pool
                 ),
-                key=lambda pair: (-pair[0].total, pair[1].cost, pair[1].id),
+                key=lambda pair: (
+                    -(pair[0].total - use_counts[pair[1].id] * 15),
+                    pair[1].cost,
+                    pair[1].id,
+                ),
             )
             score, candidate = ranked[0]
             slot_key = f"{day.isoformat()}:{period.value}"
@@ -101,7 +106,10 @@ class ConstraintAwareScheduler:
                 category=candidate.category,
                 tags=tuple(sorted(candidate.tags)),
                 traveler_ids=traveler_ids,
-                evidence_ids=(f"ev-r{revision}-{self._step_suffix(candidate)}",),
+                evidence_ids=(
+                    candidate.evidence_ids
+                    or (f"ev-r{revision}-{self._step_suffix(candidate)}",)
+                ),
                 required_transit_minutes=candidate.required_transit_minutes,
                 opening_window_start=self._opening_start(day, period),
                 opening_window_end=self._opening_end(day, period),
