@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import date
 from decimal import Decimal
 
@@ -96,3 +97,24 @@ def test_scheduler_preserves_candidate_citations() -> None:
         "ev-lunch",
         "ev-museum",
     }
+
+
+def test_candidate_builder_supplements_thin_periods_for_multi_day_trip() -> None:
+    three_day_request = request().model_copy(update={"end_date": date(2030, 10, 3)})
+    facts = (
+        fact("harbour", "morning"),
+        fact("lunch", "lunch", category="restaurant"),
+        fact("museum", "afternoon", category="museum"),
+    )
+
+    built = EvidenceCandidateBuilder().build(
+        three_day_request,
+        (result(*facts),),
+        revision=1,
+    )
+
+    assert built.source_mode == "mixed"
+    assert built.fallback_count > 0
+    counts = Counter(item.period for item in built.candidates)
+    assert counts["morning"] >= 3
+    assert counts["afternoon"] >= 3

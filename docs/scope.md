@@ -69,7 +69,7 @@
 
 ## 最终验收（2026-08-04）
 
-- 96 个测试全部通过，覆盖率 88.80%，Ruff 与 strict mypy 通过。
+- 97 个测试全部通过，覆盖率 88.84%，Ruff 与 strict mypy 通过。
 - 80 个离线案例按 `50 standard / 20 dynamic / 10 fault` 固化。
 - FastAPI 支持异步 run、状态查询、SSE trace、disruption 注入和 approval 恢复。
 - 有效 Python 代码约 9.36k 行，接近 10k–13k 规模预算下界；未通过复制案例或增加无职责 Agent 凑行数。

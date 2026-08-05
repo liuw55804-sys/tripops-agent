@@ -172,7 +172,7 @@ async def _nearby_places(
                 "generator": "geosearch",
                 "ggscoord": f"{resolved['latitude']}|{resolved['longitude']}",
                 "ggsradius": 10000,
-                "ggslimit": 14,
+                "ggslimit": 30,
                 "ggsnamespace": 0,
                 "prop": "coordinates|extracts|info",
                 "exintro": 1,
@@ -193,7 +193,7 @@ async def _nearby_places(
             if not _is_visit_candidate(title, extract):
                 continue
             category, tags, period, indoor = _classify_place(title, extract)
-            claim = extract[:500] or f"{title} is a documented place near {destination}."
+            claim = extract[:350] or f"{title} is a documented place near {destination}."
             entries.append(
                 {
                     "claim": claim,
@@ -340,7 +340,6 @@ def _is_visit_candidate(title: str, extract: str) -> bool:
     place_terms = {
         "beach",
         "bridge",
-        "building",
         "cathedral",
         "church",
         "gallery",
@@ -354,11 +353,9 @@ def _is_visit_candidate(title: str, extract: str) -> bool:
         "opera",
         "park",
         "reserve",
-        "station",
         "temple",
         "theatre",
         "tower",
-        "university",
         "zoo",
     }
     return any(term in text for term in place_terms)

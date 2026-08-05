@@ -72,7 +72,7 @@ Candidate Builder 会把带 citation 的 `CandidateFact` 规范化成可排程�
 
 ## 可验证结果
 
-- 96 个自动化测试，语句/分支综合覆盖率 88.80%。
+- 97 个自动化测试，语句/分支综合覆盖率 88.84%。
 - 约 9.36k 行有效 Python（源码、测试与 MCP Mock），仓库首个提交共 12k+ 行。
 - 50 个标准约束、20 个动态变更、10 个故障注入案例。
 - 基线中 labelled violation F1、citation correctness/freshness、局部影响召回、原计划保留和 fallback 成功率均为 100%。

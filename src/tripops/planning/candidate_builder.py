@@ -1,4 +1,6 @@
+from collections import Counter
 from decimal import Decimal
+from math import ceil
 from typing import Protocol
 
 from pydantic import BaseModel
@@ -63,14 +65,19 @@ class EvidenceCandidateBuilder:
                 fallback_count=len(fallback),
             )
 
-        present_periods = {
+        period_counts = Counter(
             (candidate.location.casefold(), candidate.period) for candidate in real
-        }
-        supplements = tuple(
-            candidate
-            for candidate in fallback
-            if (candidate.location.casefold(), candidate.period) not in present_periods
         )
+        days = (request.end_date - request.start_date).days + 1
+        target_per_period = max(1, ceil(days / len(request.destinations)))
+        supplements_list: list[CandidateActivity] = []
+        for candidate in fallback:
+            key = (candidate.location.casefold(), candidate.period)
+            if period_counts[key] >= target_per_period:
+                continue
+            supplements_list.append(candidate)
+            period_counts[key] += 1
+        supplements = tuple(supplements_list)
         combined = self._deduplicate((*real, *supplements))
         return CandidateBuildResult(
             candidates=combined,

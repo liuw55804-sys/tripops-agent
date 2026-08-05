@@ -176,16 +176,19 @@ async def test_graph_builds_and_schedules_cited_candidates_after_research() -> N
 
     result = await trip_graph.run(initial_state(request()))
 
-    assert result["plan"].metadata["candidate_source_mode"] == "real"
+    assert result["plan"].metadata["candidate_source_mode"] == "mixed"
     assert len(result["plan"].itinerary) == 15
+    cited_items = [
+        item for item in result["plan"].itinerary if item.title.startswith("Cited")
+    ]
+    assert cited_items
     assert all(
-        item.evidence_ids == ("ev-r1-weather",)
-        for item in result["plan"].itinerary
+        item.evidence_ids == ("ev-r1-weather",) for item in cited_items
     )
     summary = next(
         event for event in traces.snapshot() if event.name == "candidate_build_summary"
     )
-    assert summary.status is TraceStatus.SUCCEEDED
+    assert summary.status is TraceStatus.DEGRADED
     assert summary.attributes["fact_count"] == 3
 
 

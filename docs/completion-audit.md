@@ -20,7 +20,7 @@
 | 全链路追踪 | run/agent/step/tool/citation/violation/approval/degradation schema、JSONL/SSE | trace tests与 API trace/SSE test |
 | 离线评测 | 50 standard + 20 dynamic + 10 fault，JSON/Markdown report | `uv run tripops-eval`，labelled F1 等基线指标 |
 | 可运行演示 | FastAPI async run、status、SSE、trace、disruption、approval；offline/llm modes | TestClient E2E 与真实 Uvicorn `/health` smoke |
-| 质量门禁 | Ruff、strict mypy、pytest-cov、GitHub Actions | 96 tests；88.80% coverage；CI workflow |
+| 质量门禁 | Ruff、strict mypy、pytest-cov、GitHub Actions | 97 tests；88.84% coverage；CI workflow |
 | 代码规模 | 源码、测试与 MCP mock 约 9.36k 行；首提交 12k+ 总行 | `find ... -name '*.py' ... wc -l` |
 
 ## 指标边界
