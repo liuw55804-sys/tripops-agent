@@ -45,9 +45,18 @@ class FxRateProvider(Protocol):
 class FrankfurterFxRateProvider:
     async def get_rate(self, base: str, quote: str) -> FxRate:
         url = FRANKFURTER_RATE_URL.format(base=base, quote=quote)
-        async with httpx.AsyncClient(timeout=5) as client:
-            response = await client.get(url)
-            response.raise_for_status()
+        response: httpx.Response | None = None
+        async with httpx.AsyncClient(timeout=10) as client:
+            for attempt in range(2):
+                try:
+                    response = await client.get(url)
+                    response.raise_for_status()
+                    break
+                except httpx.HTTPError:
+                    if attempt == 1:
+                        raise
+        if response is None:
+            raise RuntimeError("exchange-rate provider returned no response")
         payload = response.json()
         return FxRate(
             base=str(payload["base"]),
