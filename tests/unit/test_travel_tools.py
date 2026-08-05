@@ -60,6 +60,20 @@ def response(request: httpx.Request) -> httpx.Response:
                 }
             },
         )
+    if request.url.host == "api.tavily.com":
+        return httpx.Response(
+            200,
+            json={
+                "results": [
+                    {
+                        "title": "Best Melbourne Hotels in 2026 (From $49)",
+                        "url": "https://example.com/hotel-list",
+                        "content": "A search result page listing many unrelated hotels.",
+                        "score": 0.9,
+                    }
+                ]
+            },
+        )
     raise AssertionError(f"unexpected request: {request.url}")
 
 
@@ -137,6 +151,13 @@ async def test_tavily_tool_is_registered_only_when_key_is_configured(
             client,
             tavily_api_key="configured-for-test",
         )
+        payload = await invoke(
+            tool_engine,
+            "live.tavily.search",
+            {"capability": "accommodation_search", "query": "Melbourne hotels"},
+        )
 
     assert "transport_search" in capabilities
     assert registry.get("live.tavily.search").enabled
+    assert payload["evidence"]
+    assert "candidate" not in payload["evidence"][0]

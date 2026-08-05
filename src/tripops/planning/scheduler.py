@@ -9,6 +9,7 @@ from tripops.domain.constraints import ConstraintKind
 from tripops.domain.plan import ItineraryItem
 from tripops.domain.trip import TripRequest
 from tripops.planning.catalog import ActivityPeriod, CandidateActivity, DemoDestinationCatalog
+from tripops.planning.route import allocate_destination_days
 from tripops.planning.scoring import CandidateScore, GroupPreferenceScorer
 
 
@@ -33,6 +34,8 @@ class ScheduleExplanation(BaseModel):
     preserved_item_ids: tuple[str, ...]
     total_cost: Decimal = Field(ge=0)
     budget_remaining: Decimal = Field(ge=0)
+    estimated_cost_item_ids: tuple[str, ...] = ()
+    unknown_cost_item_ids: tuple[str, ...] = ()
 
 
 class ConstraintAwareScheduler:
@@ -64,9 +67,24 @@ class ConstraintAwareScheduler:
         explanations: list[SelectionExplanation] = []
         use_counts: Counter[str] = Counter()
         traveler_ids = tuple(traveler.id for traveler in request.travelers)
+        destination_by_day = {
+            item.day: item.destination for item in allocate_destination_days(request)
+        }
 
         for day, period in self._slots(request.start_date, request.end_date):
-            pool = [candidate for candidate in eligible if candidate.period is period]
+            fixed = [
+                candidate
+                for candidate in eligible
+                if candidate.period is period and candidate.fixed_date == day
+            ]
+            destination = destination_by_day[day]
+            pool = fixed or [
+                candidate
+                for candidate in eligible
+                if candidate.period is period
+                and candidate.fixed_date is None
+                and candidate.location.casefold() == destination.casefold()
+            ]
             if not pool:
                 continue
             outstanding = frozenset(tag for tag, count in remaining_required.items() if count > 0)
@@ -121,6 +139,8 @@ class ConstraintAwareScheduler:
                     "accessibility_features": sorted(candidate.accessibility_features),
                     "selection_score": score.total,
                     "preference_matches": score.traveler_matches,
+                    "cost_status": candidate.cost_status.value,
+                    "scheduled_destination": destination,
                 },
             )
             selected.append(item)
@@ -144,6 +164,16 @@ class ConstraintAwareScheduler:
             preserved_item_ids=preserved_ids,
             total_cost=total_cost,
             budget_remaining=max(Decimal("0"), request.budget - total_cost),
+            estimated_cost_item_ids=tuple(
+                item.id
+                for item in selected
+                if item.metadata.get("cost_status") == "estimated"
+            ),
+            unknown_cost_item_ids=tuple(
+                item.id
+                for item in selected
+                if item.metadata.get("cost_status") == "unknown"
+            ),
         )
         return tuple(sorted(selected, key=lambda item: (item.starts_at, item.id))), explanation
 

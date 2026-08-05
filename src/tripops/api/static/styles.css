@@ -89,6 +89,7 @@ main { overflow: hidden; }
 .form-intro p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .field-row.three { grid-template-columns: repeat(3, 1fr); }
+.field-row.four { grid-template-columns: repeat(4, 1fr); }
 .trip-form label, .trip-form legend { display: block; margin-bottom: 18px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .03em; }
 .trip-form input:not([type="checkbox"]), .trip-form textarea { width: 100%; margin-top: 8px; padding: 13px 14px; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 2px; font-size: 14px; outline: none; transition: border .2s, box-shadow .2s; }
 .trip-form input:focus, .trip-form textarea:focus { border-color: var(--sea); box-shadow: 0 0 0 3px rgba(8,127,142,.1); }
@@ -169,6 +170,7 @@ main { overflow: hidden; }
 .itinerary-item h4 { margin: 0; font-size: 12px; }
 .itinerary-item p { margin: 4px 0 0; color: var(--muted); font-size: 9px; }
 .item-cost { white-space: nowrap; font: 500 9px DM Mono, monospace; }
+.item-cost.warning { color: var(--coral); }
 .insight-column { display: grid; gap: 20px; }
 .constraints-card { background: var(--foam); }
 #constraint-health, #skills, .evidence-list { padding: 18px 22px; }
@@ -224,7 +226,7 @@ footer > a { font-size: 11px; }
   .section-heading, .results-head { align-items: flex-start; flex-direction: column; }
   .section-heading > p { margin: 0; }
   .trip-form, .agent-dock { padding: 27px 20px; }
-  .field-row, .field-row.three { grid-template-columns: 1fr; gap: 0; }
+  .field-row, .field-row.three, .field-row.four { grid-template-columns: 1fr; gap: 0; }
   .choice-grid { grid-template-columns: repeat(2, 1fr); }
   .dock-header { gap: 15px; }
   .metric-strip { grid-template-columns: repeat(2, 1fr); }

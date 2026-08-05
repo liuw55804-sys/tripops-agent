@@ -277,6 +277,7 @@ def build_tripops_graph(
                 "candidate_count": len(built.candidates),
                 "fact_count": built.fact_count,
                 "fallback_count": built.fallback_count,
+                "unpriced_capabilities": list(built.unpriced_capabilities),
             },
         )
         updated_plan = plan.model_copy(
@@ -289,6 +290,11 @@ def build_tripops_graph(
                     "candidate_fact_count": built.fact_count,
                     "candidate_fallback_count": built.fallback_count,
                     "schedule_fairness": explanation.jain_fairness,
+                    "estimated_cost_item_count": len(
+                        explanation.estimated_cost_item_ids
+                    ),
+                    "unknown_cost_item_count": len(explanation.unknown_cost_item_ids),
+                    "unpriced_capabilities": built.unpriced_capabilities,
                 },
             }
         )

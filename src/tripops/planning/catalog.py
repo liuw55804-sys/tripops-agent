@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 from enum import StrEnum
 
@@ -13,6 +14,12 @@ class ActivityPeriod(StrEnum):
     EVENING = "evening"
 
 
+class CandidateCostStatus(StrEnum):
+    QUOTED = "quoted"
+    ESTIMATED = "estimated"
+    UNKNOWN = "unknown"
+
+
 class CandidateActivity(BaseModel):
     id: str = Field(min_length=1)
     title: str = Field(min_length=1)
@@ -22,6 +29,7 @@ class CandidateActivity(BaseModel):
     period: ActivityPeriod
     duration_minutes: int = Field(ge=30, le=720)
     cost: Decimal = Field(ge=0)
+    cost_status: CandidateCostStatus = CandidateCostStatus.ESTIMATED
     required_transit_minutes: int = Field(default=30, ge=0, le=240)
     indoor: bool = False
     dietary_risks: frozenset[str] = frozenset()
@@ -30,6 +38,7 @@ class CandidateActivity(BaseModel):
     )
     source_capability: str = "poi_search"
     evidence_ids: tuple[str, ...] = ()
+    fixed_date: date | None = None
 
 
 class DemoDestinationCatalog:

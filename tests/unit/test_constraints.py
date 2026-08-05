@@ -135,6 +135,36 @@ async def test_verifier_detects_budget_overlap_opening_and_stale_evidence() -> N
 
 
 @pytest.mark.asyncio
+async def test_verifier_does_not_claim_budget_passes_with_unknown_prices() -> None:
+    unknown = item(
+        "intercity-transfer",
+        9,
+        12,
+        cost="0",
+        category="transport",
+        metadata={"cost_status": "unknown"},
+    )
+    plan = TravelPlan(
+        trip_id="trip-1",
+        itinerary=(unknown,),
+        estimated_total_cost=Decimal("0"),
+        metadata={"unpriced_capabilities": ("transport_search", "accommodation_search")},
+    )
+
+    violations = await DeterministicConstraintVerifier(clock=lambda: NOW).verify(
+        graph_state(trip_request(), plan, [fresh_evidence()])
+    )
+
+    budget_warning = next(
+        violation
+        for violation in violations
+        if violation.code is ViolationCode.BUDGET_UNVERIFIED
+    )
+    assert budget_warning.severity is ViolationSeverity.WARNING
+    assert budget_warning.affected_item_ids == ("intercity-transfer",)
+
+
+@pytest.mark.asyncio
 async def test_verifier_checks_domain_constraints() -> None:
     constraints = (
         Constraint(
@@ -250,4 +280,3 @@ def test_impact_analyzer_uses_violation_capabilities() -> None:
 
     assert scope.affected_step_ids == ("rail",)
     assert scope.required_capabilities == ("transport_search",)
-

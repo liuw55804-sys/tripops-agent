@@ -1,7 +1,8 @@
+import re
 from datetime import date
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from tripops.domain.constraints import Constraint
 
@@ -26,10 +27,30 @@ class TripRequest(BaseModel):
     constraints: tuple[Constraint, ...] = ()
     raw_requirement: str = ""
 
+    @field_validator("destinations", mode="before")
+    @classmethod
+    def split_destination_route(cls, value: object) -> object:
+        if not isinstance(value, (list, tuple)):
+            return value
+        destinations = []
+        for item in value:
+            if not isinstance(item, str):
+                destinations.append(item)
+                continue
+            destinations.extend(
+                part.strip()
+                for part in re.split(r"\s*(?:、|，|;|→|->|\n)\s*", item)
+                if part.strip()
+            )
+        return tuple(dict.fromkeys(destinations))
+
     @model_validator(mode="after")
     def validate_dates_and_travelers(self) -> "TripRequest":
         if self.end_date < self.start_date:
             raise ValueError("end_date cannot be earlier than start_date")
+        trip_days = (self.end_date - self.start_date).days + 1
+        if len(self.destinations) > trip_days:
+            raise ValueError("trip must have at least one day per destination")
         traveler_ids = [traveler.id for traveler in self.travelers]
         if len(traveler_ids) != len(set(traveler_ids)):
             raise ValueError("traveler ids must be unique")
@@ -39,4 +60,3 @@ class TripRequest(BaseModel):
             if unknown:
                 raise ValueError(f"constraint references unknown travelers: {sorted(unknown)}")
         return self
-

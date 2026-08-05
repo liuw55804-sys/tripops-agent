@@ -41,8 +41,9 @@ flowchart TD
 - Supervisor 不直接搜索，也不直接生成完整行程，只决定控制流。
 - Planner 不调用外部事实工具，只构造或修订任务 DAG，不在 Research 之前生成 itinerary。
 - Researcher 只能输出 `Evidence` 和引用该 Evidence 的 `CandidateFact`，不能直接修改计划或宣布任务完成。
-- Candidate Builder 去重、规范化真实候选，并为缺失的“目的地 × 时段”显式补入 demo candidate。
-- 确定性 Scheduler 在研究后负责候选硬过滤、时间槽、预算和 Jain fairness。
+- Candidate Builder 去重、规范化真实候选，并为缺失的“目的地 × 时段”显式补入 demo candidate；网页搜索结果本身不是可排程实体。
+- Route allocator 按目的地顺序生成连续城市日期段，并在边界日生成带交通 Evidence 的固定转场 slot。
+- 确定性 Scheduler 在研究后负责按当日城市过滤候选、时间槽、预算和 Jain fairness。未知价格不会以零元充当真实报价。
 - Verifier 只消费结构化行程、约束和证据，输出 `Violation`。
 - 确定性校验优先；只有主观偏好和证据充分性允许模型辅助判断。
 

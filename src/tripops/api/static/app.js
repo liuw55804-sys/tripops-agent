@@ -105,7 +105,7 @@ function dateLabel(iso, index) {
 }
 
 function categoryName(category) {
-  return ({ meal: "餐饮", transport: "交通", activity: "体验", accommodation: "住宿" })[category] || "行程";
+  return ({ meal: "餐饮", restaurant: "餐饮", food: "餐饮", transport: "交通", activity: "体验", accommodation: "住宿" })[category] || "行程";
 }
 
 function renderItinerary(plan, changedIds = new Set()) {
@@ -128,7 +128,9 @@ function renderItinerary(plan, changedIds = new Set()) {
       row.append(node("span", "item-time", item.starts_at.slice(11, 16)), node("i", "item-dot"));
       const copy = node("div");
       copy.append(node("h4", "", item.title), node("p", "", `${item.location} · ${categoryName(item.category)}${item.required_transit_minutes ? ` · 转场 ${item.required_transit_minutes} 分钟` : ""}`));
-      row.append(copy, node("span", "item-cost", formatMoney(item.cost, plan.currency)));
+      const costStatus = item.metadata?.cost_status;
+      const costLabel = costStatus === "unknown" ? "待核价" : `${costStatus === "estimated" ? "约 " : ""}${formatMoney(item.cost, plan.currency)}`;
+      row.append(copy, node("span", `item-cost${costStatus === "unknown" ? " warning" : ""}`, costLabel));
       itemList.append(row);
     });
     group.append(label, itemList);
@@ -139,10 +141,13 @@ function renderItinerary(plan, changedIds = new Set()) {
 function renderMetrics(run) {
   const itinerary = run.plan?.itinerary || [];
   const dayCount = new Set(itinerary.map((item) => item.starts_at.slice(0, 10))).size;
+  const unknownCount = Number(run.plan?.metadata?.unknown_cost_item_count || 0);
+  const unpricedCapabilities = run.plan?.metadata?.unpriced_capabilities || [];
+  const costValue = `${formatMoney(run.plan?.estimated_total_cost, run.plan?.currency)}${unknownCount || unpricedCapabilities.length ? " + 待核价" : ""}`;
   const values = [
     [String(dayCount), "旅行天数"],
     [String(itinerary.length), "已安排体验"],
-    [formatMoney(run.plan?.estimated_total_cost, run.plan?.currency), "预计行程内支出"],
+    [costValue, unknownCount || unpricedCapabilities.length ? "已估支出（预算未闭合）" : "预计行程内支出"],
     [`${run.evidence?.length || 0}/${run.evidence?.length || 0}`, "建议引用证据"],
   ];
   const target = $("#metrics");
@@ -163,15 +168,17 @@ function renderConstraints(run) {
     mixed: ["真实候选来源", true, "部分补位"],
     fallback: ["真实候选来源", true, "演示降级"],
   }[candidateMode] || ["真实候选来源", true, candidateMode];
+  const budgetExceeded = run.violations?.some((v) => v.code === "budget_exceeded");
+  const budgetUnverified = run.violations?.some((v) => v.code === "budget_unverified");
   const rows = [
-    ["预算上限", run.violations?.some((v) => v.code === "budget_exceeded")],
-    ["日程无冲突", run.violations?.some((v) => ["time_overlap", "date_out_of_range"].includes(v.code))],
-    ["证据完整性", run.violations?.some((v) => ["evidence_missing", "stale_evidence"].includes(v.code))],
-    ["硬约束校验", run.violations?.some((v) => v.severity === "error")],
+    ["预算上限", budgetExceeded || budgetUnverified, budgetExceeded ? "已超支" : budgetUnverified ? "待核价" : "✓ 通过"],
+    ["日程无冲突", run.violations?.some((v) => ["time_overlap", "date_out_of_range"].includes(v.code)), null],
+    ["证据完整性", run.violations?.some((v) => ["evidence_missing", "stale_evidence"].includes(v.code)), null],
+    ["硬约束校验", run.violations?.some((v) => v.severity === "error"), null],
   ];
-  rows.forEach(([label, failed]) => {
+  rows.forEach(([label, failed, explicitStatus]) => {
     const row = node("div", "health-row");
-    const status = node("b", failed ? "warning" : "", failed ? "需关注" : "✓ 通过");
+    const status = node("b", failed ? "warning" : "", explicitStatus || (failed ? "需关注" : "✓ 通过"));
     row.append(node("span", "", label), status);
     target.append(row);
   });
@@ -320,17 +327,19 @@ function formPayload() {
   const form = new FormData($("#trip-form"));
   const preferences = form.getAll("preference");
   const rawRequirement = String(form.get("requirement") || "").trim();
+  const destinations = String(form.get("destination") || "").split(/\s*(?:、|，|;|→|->|\n)\s*/).filter(Boolean);
+  const travelerCount = Math.max(1, Number(form.get("traveler_count") || 1));
   const id = `southbound-${Date.now()}`;
   return {
     request: {
       id,
       origin: String(form.get("origin")),
-      destinations: [String(form.get("destination"))],
+      destinations,
       start_date: String(form.get("start_date")),
       end_date: String(form.get("end_date")),
       currency: "CNY",
       budget: String(form.get("budget")),
-      travelers: [{ id: "traveler-1", display_name: "旅行者", preferences }],
+      travelers: Array.from({ length: travelerCount }, (_, index) => ({ id: `traveler-${index + 1}`, display_name: `旅行者 ${index + 1}`, preferences })),
       constraints: [],
       raw_requirement: rawRequirement,
     },
@@ -351,7 +360,7 @@ async function startPlanning(event) {
     showRunState(started.run_id);
     subscribeToEvents(started.run_id);
     await pollRun(started.run_id);
-    toast("行程已生成，所有建议均已通过约束校验。 ");
+    toast("行程已生成，请查看预算待核价项与候选来源。");
     $("#results").scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (error) {
     $("#run-badge").textContent = "执行失败";
@@ -409,6 +418,7 @@ function loadDemo() {
   $("#origin").value = "上海";
   $("#destination").value = "新西兰皇后镇";
   $("#budget").value = "18000";
+  $("#traveler-count").value = "1";
   $("#requirement").value = "每天不要安排太满，保留看日落的时间；优先公共交通。";
   setDemoDates();
   $("#planner").scrollIntoView({ behavior: "smooth" });

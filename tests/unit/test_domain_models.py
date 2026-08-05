@@ -42,6 +42,20 @@ def test_trip_request_accepts_known_traveler_constraint() -> None:
     assert request.travelers[0].id == "u1"
 
 
+def test_trip_request_splits_ordered_multi_destination_route() -> None:
+    request = TripRequest(
+        id="multi-city",
+        origin="上海",
+        destinations=("悉尼、墨尔本",),
+        start_date=date(2026, 9, 30),
+        end_date=date(2026, 10, 8),
+        budget=Decimal("21000"),
+        travelers=(Traveler(id="u1", display_name="Alice"),),
+    )
+
+    assert request.destinations == ("悉尼", "墨尔本")
+
+
 def test_trip_request_rejects_unknown_traveler_constraint() -> None:
     constraint = Constraint(
         id="c1",
@@ -91,4 +105,3 @@ def test_evidence_expiration_is_time_aware() -> None:
     )
 
     assert evidence.is_stale(now=now)
-

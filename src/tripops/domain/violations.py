@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 class ViolationCode(StrEnum):
     BUDGET_EXCEEDED = "budget_exceeded"
+    BUDGET_UNVERIFIED = "budget_unverified"
     TIME_OVERLAP = "time_overlap"
     CLOSED_AT_ARRIVAL = "closed_at_arrival"
     TRANSIT_TIME_INSUFFICIENT = "transit_time_insufficient"

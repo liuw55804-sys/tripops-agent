@@ -53,6 +53,29 @@ class DeterministicConstraintVerifier:
     def _verify_budget(self, request: TripRequest, plan: TravelPlan) -> list[Violation]:
         actual_total = sum((item.cost for item in plan.itinerary), start=Decimal("0"))
         violations = []
+        unknown_item_ids = tuple(
+            item.id
+            for item in plan.itinerary
+            if item.metadata.get("cost_status") == "unknown"
+        )
+        raw_unpriced = plan.metadata.get("unpriced_capabilities", ())
+        unpriced_capabilities = (
+            tuple(str(item) for item in raw_unpriced)
+            if isinstance(raw_unpriced, (list, tuple, set))
+            else ()
+        )
+        if unknown_item_ids or unpriced_capabilities:
+            missing = ", ".join(unpriced_capabilities) or "scheduled items"
+            violations.append(
+                self._violation(
+                    ViolationCode.BUDGET_UNVERIFIED,
+                    f"budget cannot be verified until prices are confirmed for: {missing}",
+                    severity=ViolationSeverity.WARNING,
+                    item_ids=unknown_item_ids,
+                    hint="confirm transport, accommodation, meal and ticket prices",
+                    capabilities=unpriced_capabilities,
+                )
+            )
         if actual_total > request.budget:
             violations.append(
                 self._violation(

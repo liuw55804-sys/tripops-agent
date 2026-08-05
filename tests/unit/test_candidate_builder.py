@@ -118,3 +118,37 @@ def test_candidate_builder_supplements_thin_periods_for_multi_day_trip() -> None
     counts = Counter(item.period for item in built.candidates)
     assert counts["morning"] >= 3
     assert counts["afternoon"] >= 3
+
+
+def test_multi_city_schedule_is_contiguous_and_reserves_transition_slot() -> None:
+    multi_city = request().model_copy(
+        update={
+            "destinations": ("Sydney", "Melbourne"),
+            "end_date": date(2030, 10, 4),
+        }
+    )
+    built = EvidenceCandidateBuilder().build(multi_city, (), revision=1)
+
+    itinerary, explanation = ConstraintAwareScheduler().schedule(
+        multi_city,
+        revision=1,
+        candidates=built.candidates,
+    )
+
+    by_day = {
+        day: {
+            item.metadata["scheduled_destination"]
+            for item in itinerary
+            if item.starts_at.date() == day
+        }
+        for day in (date(2030, 10, 1), date(2030, 10, 2), date(2030, 10, 3), date(2030, 10, 4))
+    }
+    assert by_day[date(2030, 10, 1)] == {"Sydney"}
+    assert by_day[date(2030, 10, 2)] == {"Sydney"}
+    assert by_day[date(2030, 10, 3)] == {"Melbourne"}
+    assert by_day[date(2030, 10, 4)] == {"Melbourne"}
+    transfer = next(item for item in itinerary if item.category == "transport")
+    assert transfer.starts_at.date() == date(2030, 10, 3)
+    assert "Sydney → Melbourne" in transfer.title
+    assert transfer.metadata["cost_status"] == "unknown"
+    assert transfer.id in explanation.unknown_cost_item_ids

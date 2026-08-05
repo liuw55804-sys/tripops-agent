@@ -17,11 +17,13 @@ def test_web_app_and_static_assets_are_served() -> None:
     assert page.status_code == 200
     assert "TripOps · 南纬假日实验室" in page.text
     assert 'id="trip-form"' in page.text
+    assert 'name="traveler_count"' in page.text
     assert stylesheet.status_code == 200
     assert stylesheet.headers["content-type"].startswith("text/css")
     assert "--coral: #f66f52" in stylesheet.text
     assert script.status_code == 200
     assert "simulateStorm" in script.text
+    assert "budget_unverified" in script.text
 
 
 def test_health() -> None:

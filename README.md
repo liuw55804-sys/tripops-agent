@@ -66,13 +66,13 @@ API 启动后：
 | --- | --- | --- | --- |
 | [Open-Meteo](https://open-meteo.com/en/docs) | 地理编码、天气预报 | 无需 | 仅请求可用预报窗口；超出时显式返回“不可预报” |
 | [MediaWiki Action API](https://www.mediawiki.org/wiki/API%3ASearch/en) | 目的地附近 POI 与可引用页面 | 无需 | 提供地点候选，不代替票价/营业时间核验 |
-| [Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search) | 交通、政策、餐饮、住宿和当前网页搜索 | `TRIPOPS_TAVILY_API_KEY` | 可选；未配置时对应 capability 显式降级 |
+| [Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search) | 交通、政策、餐饮、住宿和当前网页搜索 | `TRIPOPS_TAVILY_API_KEY` | 只生成 Evidence；搜索结果页不会被伪装成已核价候选 |
 
-Candidate Builder 会把带 citation 的 `CandidateFact` 规范化成可排程候选。候选不足时仅补齐缺失时段，并在 plan metadata、trace 和页面标记 `real / mixed / fallback`，不将演示目录伪装为实时搜索结果。
+Candidate Builder 会把带 citation 的 `CandidateFact` 规范化成可排程候选。多目的地先被分配为连续城市日期段，切换日固定为城际转场；候选不足时按“城市 × 时段”补位。价格未被可靠来源确认时显示“待核价”，Verifier 输出 `budget_unverified`，不会宣称预算已通过。
 
 ## 可验证结果
 
-- 97 个自动化测试，语句/分支综合覆盖率 88.84%。
+- 100 个自动化测试，语句/分支综合覆盖率 89.35%。
 - 约 9.36k 行有效 Python（源码、测试与 MCP Mock），仓库首个提交共 12k+ 行。
 - 50 个标准约束、20 个动态变更、10 个故障注入案例。
 - 基线中 labelled violation F1、citation correctness/freshness、局部影响召回、原计划保留和 fallback 成功率均为 100%。

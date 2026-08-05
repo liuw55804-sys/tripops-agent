@@ -91,6 +91,24 @@ async def _weather_forecast(
     client: httpx.AsyncClient,
     arguments: dict[str, Any],
 ) -> dict[str, Any]:
+    destinations = [str(item) for item in arguments.get("destinations", [])]
+    if len(destinations) > 1:
+        payloads = [
+            await _weather_forecast(
+                client,
+                {**arguments, "destinations": [], "location": destination},
+            )
+            for destination in destinations
+        ]
+        return {
+            "summary": " ".join(str(payload["summary"]) for payload in payloads),
+            "source_uri": OPEN_METEO_FORECAST_URL,
+            "evidence": [
+                evidence
+                for payload in payloads
+                for evidence in payload.get("evidence", [])
+            ],
+        }
     location = str(arguments["location"])
     start_date = date.fromisoformat(str(arguments["start_date"]))
     end_date = date.fromisoformat(str(arguments["end_date"]))
@@ -208,7 +226,6 @@ async def _nearby_places(
                         "tags": sorted(tags),
                         "preferred_period": period,
                         "duration_minutes": 120,
-                        "estimated_cost": "0",
                         "required_transit_minutes": 30,
                         "indoor": indoor,
                     },
@@ -240,14 +257,7 @@ async def _tavily_search(
         },
     )
     response.raise_for_status()
-    destinations = [str(item) for item in arguments.get("destinations", [])]
-    location = destinations[0] if destinations else "destination"
     entries = []
-    candidate_capabilities = {
-        "poi_search",
-        "restaurant_search",
-        "accommodation_search",
-    }
     for result in response.json().get("results", []):
         title = str(result.get("title", "")).strip()
         source_uri = str(result.get("url", "")).strip()
@@ -260,23 +270,6 @@ async def _tavily_search(
             "source_uri": source_uri,
             "confidence": min(0.95, max(0.55, float(result.get("score", 0.7)))),
         }
-        if capability in candidate_capabilities:
-            category = {
-                "restaurant_search": "restaurant",
-                "accommodation_search": "accommodation",
-            }.get(capability, "landmark")
-            entry["candidate"] = {
-                "id": _stable_id("web", title, location),
-                "title": title,
-                "location": location,
-                "category": category,
-                "tags": [category, "web-researched"],
-                "preferred_period": "lunch" if category == "restaurant" else "afternoon",
-                "duration_minutes": 75 if category == "restaurant" else 120,
-                "estimated_cost": "0",
-                "required_transit_minutes": 30,
-                "indoor": category in {"restaurant", "accommodation"},
-            }
         entries.append(entry)
     return {
         "summary": f"Tavily returned {len(entries)} current web results for {capability}.",
