@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import re
 from datetime import UTC, date, datetime, timedelta
@@ -241,39 +242,46 @@ async def _tavily_search(
     api_key: str,
 ) -> dict[str, Any]:
     capability = str(arguments.get("capability", "general_research"))
-    query = _travel_search_query(arguments)
-    response = await client.post(
-        TAVILY_SEARCH_URL,
-        headers={"Authorization": f"Bearer {api_key}"},
-        json={
-            "query": query,
-            "search_depth": "advanced",
-            "chunks_per_source": 3,
-            "max_results": 8,
-            "include_answer": False,
-            "include_raw_content": False,
-        },
-    )
-    response.raise_for_status()
-    entries = []
-    for result in response.json().get("results", []):
-        title = str(result.get("title", "")).strip()
-        source_uri = str(result.get("url", "")).strip()
-        content = str(result.get("content", "")).strip()
-        if not title or not source_uri or not content:
-            continue
-        entry: dict[str, Any] = {
-            "claim": content[:700],
-            "source_name": "tavily-web-search",
-            "source_uri": source_uri,
-            "confidence": min(0.95, max(0.55, float(result.get("score", 0.7)))),
-            "metadata": {
-                "search_title": title,
-                "search_query": query,
-                "source_score": round(float(result.get("score", 0.7)), 4),
+    queries = _travel_search_queries(arguments)
+
+    async def search(query: str) -> tuple[str, list[dict[str, Any]]]:
+        response = await client.post(
+            TAVILY_SEARCH_URL,
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={
+                "query": query,
+                "search_depth": "advanced",
+                "chunks_per_source": 3,
+                "max_results": 6,
+                "include_answer": False,
+                "include_raw_content": False,
             },
-        }
-        entries.append(entry)
+        )
+        response.raise_for_status()
+        return query, list(response.json().get("results", []))
+
+    entries = []
+    seen_urls: set[str] = set()
+    for query, results in await asyncio.gather(*(search(query) for query in queries)):
+        for result in results:
+            title = str(result.get("title", "")).strip()
+            source_uri = str(result.get("url", "")).strip()
+            content = str(result.get("content", "")).strip()
+            if not title or not source_uri or not content or source_uri in seen_urls:
+                continue
+            seen_urls.add(source_uri)
+            entry: dict[str, Any] = {
+                "claim": content[:700],
+                "source_name": "tavily-web-search",
+                "source_uri": source_uri,
+                "confidence": min(0.95, max(0.55, float(result.get("score", 0.7)))),
+                "metadata": {
+                    "search_title": title,
+                    "search_query": query,
+                    "source_score": round(float(result.get("score", 0.7)), 4),
+                },
+            }
+            entries.append(entry)
     return {
         "summary": f"Tavily returned {len(entries)} current web results for {capability}.",
         "source_uri": TAVILY_SEARCH_URL,
@@ -281,10 +289,10 @@ async def _tavily_search(
     }
 
 
-def _travel_search_query(arguments: dict[str, Any]) -> str:
+def _travel_search_queries(arguments: dict[str, Any]) -> tuple[str, ...]:
     capability = str(arguments.get("capability", "general_research"))
     base = str(arguments.get("query", "travel research")).strip()
-    destinations = " ".join(str(item) for item in arguments.get("destinations", []))
+    destinations = tuple(str(item) for item in arguments.get("destinations", []))
     dates = f"{arguments.get('start_date', '')} to {arguments.get('end_date', '')}"
     travelers = str(arguments.get("traveler_count", 1))
     requirement = str(arguments.get("requirement", "")).strip()
@@ -293,11 +301,19 @@ def _travel_search_query(arguments: dict[str, Any]) -> str:
         "transport_search": "flight train fare per person booking",
         "restaurant_search": "restaurant menu average price per person reservation",
     }.get(capability, "official current travel information")
-    return " ".join(
-        part
-        for part in (base, destinations, dates, f"{travelers} travelers", intent, requirement)
-        if part
-    )[:900]
+    scopes = (
+        destinations or ("",)
+        if capability in {"accommodation_search", "restaurant_search"}
+        else (" ".join(destinations),)
+    )
+    return tuple(
+        " ".join(
+            part
+            for part in (base, scope, dates, f"{travelers} travelers", intent, requirement)
+            if part
+        )[:900]
+        for scope in scopes
+    )
 
 
 async def _geocode(client: httpx.AsyncClient, location: str) -> dict[str, Any]:

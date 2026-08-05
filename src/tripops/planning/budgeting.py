@@ -71,7 +71,8 @@ class WebQuoteExtractor:
             kind = self._kind(capability)
             if kind is None or item.source_uri is None:
                 continue
-            matches = list(PRICE_PATTERN.finditer(item.claim))
+            searchable = f'{item.metadata.get("search_title", "")}\n{item.claim}'
+            matches = list(PRICE_PATTERN.finditer(searchable))
             if not matches:
                 continue
             grouped: dict[str, list[Decimal]] = defaultdict(list)
@@ -157,6 +158,8 @@ class WebQuoteExtractor:
         years = {int(value) for value in YEAR_PATTERN.findall(text)}
         if years and request.start_date.year not in years:
             return QuoteStatus.REJECTED, "source dates do not match the trip year"
+        if "price guide" in text and "average cost for two" in text:
+            return QuoteStatus.REJECTED, "symbolic price guide is not a numeric per-person quote"
         if "melbourne" in text and any(token in text for token in ("florida", "orlando")):
             return QuoteStatus.REJECTED, "source refers to Melbourne, Florida"
         if location is None:
